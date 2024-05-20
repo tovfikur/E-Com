@@ -73,6 +73,15 @@ if settings.DEBUG:
 " >> $URLS_FILE
 
 
+echo "
+
+
+admin.site.site_header = 'Khukumoni Administration'
+admin.site.site_title = 'Khukumoni Admin Portal'
+admin.site.index_title = 'Welcome to Khukumoni Admin Area'
+"  >> $URLS_FILE
+
+
 # Add JWT and REST framework URL patterns
 URLPATTERNS_INSERT_LINE=$(grep -n "urlpatterns = \[" "$URLS_FILE" | cut -d: -f1)
 if ! grep -q "from rest_framework import routers" "$URLS_FILE"; then
@@ -115,6 +124,7 @@ echo "from django.contrib.auth.models import User; User.objects.create_superuser
 # Step 1: Create Django app
 python manage.py startapp ProductManagement
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'ProductManagement'," $SETTINGS_FILE
+
 
 # Step 2: Create Django models for each table
 
@@ -267,7 +277,7 @@ admin.site.register(Discount, DiscountAdmin)
 EOF
 
 
-# Step 3: Create Django migrations
+# Step 4: Create Django migrations
 python manage.py makemigrations ProductManagement
 
 
@@ -368,7 +378,7 @@ class InventoryAdjustmentReason(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 EOF
 
-# Step 1: Create Django admin registration for InventoryManagement models
+# Step 3: Create Django admin registration for InventoryManagement models
 cat <<EOF > InventoryManagement/admin.py
 from django.contrib import admin
 from .models import (
@@ -387,7 +397,7 @@ admin.site.register(InventoryReport)
 admin.site.register(InventoryAdjustmentReason)
 EOF
 
-# Step 3: Create Django migrations
+# Step 4: Create Django migrations
 python manage.py makemigrations InventoryManagement
 
 
@@ -689,7 +699,7 @@ admin.site.register(CalendarEvent, CalendarEventAdmin)
 admin.site.register(Document, DocumentAdmin)
 EOF
 
-# Step 3: Create Django migrations
+# Step 4: Create Django migrations
 python manage.py makemigrations CustomerManagement
 
 
@@ -872,7 +882,7 @@ admin.site.register(OrderCommunication, OrderCommunicationAdmin)
 admin.site.register(RecurringOrder, RecurringOrderAdmin)
 admin.site.register(OrderBatch, OrderBatchAdmin)
 EOF
-# Step 3: Create Django migrations
+# Step 4: Create Django migrations
 python manage.py makemigrations OrderManagement
 
 
@@ -1131,7 +1141,7 @@ python manage.py makemigrations PaymentProcessing
 
 
 
-
+## Creating Shipping and fullfillment app ##
 
 # Step 1: Create Django app
 python manage.py startapp ShippingAndFulfillment
@@ -1259,7 +1269,7 @@ python manage.py makemigrations ShippingAndFulfillment
 
 
 
-
+## Creating Search and filtering app ##
 
 # Step 1: Create Django app
 python manage.py startapp SearchAndFiltering
@@ -1397,7 +1407,7 @@ python manage.py makemigrations SearchAndFiltering
 
 
 
-
+## Creating Markeign and promotions app##
 
 # Step 1: Create Django app
 python manage.py startapp MarketingAndPromotions
@@ -1717,6 +1727,1973 @@ EOF
 
 # Step 4: Create Django migrations
 python manage.py makemigrations AnalyticsAndReporting
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Step 1: Create Django app
+python manage.py startapp WishlistManagement
+
+# Add the new app to INSTALLED_APPS in settings.py
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'WishlistManagement'," $SETTINGS_FILE
+
+# Step 2: Create Django models for each table
+
+# Wishlist models
+cat <<EOF > WishlistManagement/models.py
+from django.db import models
+
+class Wishlist(models.Model):
+    wishlist_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    privacy_setting = models.CharField(max_length=20)
+
+class WishlistItem(models.Model):
+    item_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    product_id = models.IntegerField()
+    added_at = models.DateTimeField(auto_now_add=True)
+
+class WishlistSharing(models.Model):
+    share_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    shared_with = models.CharField(max_length=255)
+    shared_at = models.DateTimeField(auto_now_add=True)
+
+class WishlistPrivacy(models.Model):
+    privacy_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    setting = models.CharField(max_length=20)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class WishlistNotification(models.Model):
+    notification_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    user_id = models.IntegerField()
+    subscribed = models.BooleanField(default=False)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+
+class WishlistCollaborator(models.Model):
+    collaboration_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    collaborator_id = models.IntegerField()
+    role = models.CharField(max_length=20)
+    status = models.CharField(max_length=20)
+    invited_at = models.DateTimeField(auto_now_add=True)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+
+class WishlistNote(models.Model):
+    note_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    item_id = models.ForeignKey(WishlistItem, on_delete=models.CASCADE)
+    note = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class WishlistRating(models.Model):
+    rating_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    item_id = models.ForeignKey(WishlistItem, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+    rated_at = models.DateTimeField(auto_now_add=True)
+
+class WishlistReview(models.Model):
+    review_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    item_id = models.ForeignKey(WishlistItem, on_delete=models.CASCADE)
+    review = models.TextField()
+    reviewed_at = models.DateTimeField(auto_now_add=True)
+
+class WishlistImportExport(models.Model):
+    operation_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    operation_type = models.CharField(max_length=20)
+    status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+class WishlistRecommendation(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    recommendations = models.JSONField()
+    generated_at = models.DateTimeField(auto_now_add=True)
+
+class WishlistAnalytics(models.Model):
+    analytics_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    views = models.IntegerField()
+    engagement = models.IntegerField()
+    conversion_rate = models.DecimalField(max_digits=10, decimal_places=2)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class WishlistSetting(models.Model):
+    setting_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    settings = models.JSONField()
+    updated_at = models.DateTimeField(auto_now=True)
+
+class WishlistSync(models.Model):
+    sync_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    devices = models.JSONField()
+    last_synced_at = models.DateTimeField(auto_now=True)
+
+class WishlistBackupRestore(models.Model):
+    backup_restore_id = models.AutoField(primary_key=True)
+    wishlist_id = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
+    operation_type = models.CharField(max_length=20)
+    status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+EOF
+
+# Step 3: Register models with Django admin
+cat <<EOF > WishlistManagement/admin.py
+from django.contrib import admin
+from .models import (
+    Wishlist, WishlistItem, WishlistSharing, WishlistPrivacy, WishlistNotification, 
+    WishlistCollaborator, WishlistNote, WishlistRating, WishlistReview, 
+    WishlistImportExport, WishlistRecommendation, WishlistAnalytics, WishlistSetting, 
+    WishlistSync, WishlistBackupRestore
+)
+
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ('wishlist_id', 'user_id', 'name', 'privacy_setting', 'created_at', 'updated_at')
+    search_fields = ('name', 'user_id')
+    list_filter = ('privacy_setting',)
+
+class WishlistItemAdmin(admin.ModelAdmin):
+    list_display = ('item_id', 'wishlist_id', 'product_id', 'added_at')
+    search_fields = ('wishlist_id', 'product_id')
+
+class WishlistSharingAdmin(admin.ModelAdmin):
+    list_display = ('share_id', 'wishlist_id', 'shared_with', 'shared_at')
+    search_fields = ('wishlist_id', 'shared_with')
+
+class WishlistPrivacyAdmin(admin.ModelAdmin):
+    list_display = ('privacy_id', 'wishlist_id', 'setting', 'updated_at')
+    search_fields = ('wishlist_id', 'setting')
+
+class WishlistNotificationAdmin(admin.ModelAdmin):
+    list_display = ('notification_id', 'wishlist_id', 'user_id', 'subscribed', 'subscribed_at')
+    search_fields = ('wishlist_id', 'user_id')
+
+class WishlistCollaboratorAdmin(admin.ModelAdmin):
+    list_display = ('collaboration_id', 'wishlist_id', 'collaborator_id', 'role', 'status', 'invited_at', 'accepted_at')
+    search_fields = ('wishlist_id', 'collaborator_id', 'role', 'status')
+
+class WishlistNoteAdmin(admin.ModelAdmin):
+    list_display = ('note_id', 'wishlist_id', 'item_id', 'note', 'created_at', 'updated_at')
+    search_fields = ('wishlist_id', 'item_id')
+
+class WishlistRatingAdmin(admin.ModelAdmin):
+    list_display = ('rating_id', 'wishlist_id', 'item_id', 'rating', 'rated_at')
+    search_fields = ('wishlist_id', 'item_id')
+
+class WishlistReviewAdmin(admin.ModelAdmin):
+    list_display = ('review_id', 'wishlist_id', 'item_id', 'review', 'reviewed_at')
+    search_fields = ('wishlist_id', 'item_id')
+
+class WishlistImportExportAdmin(admin.ModelAdmin):
+    list_display = ('operation_id', 'wishlist_id', 'operation_type', 'status', 'created_at', 'completed_at')
+    search_fields = ('wishlist_id', 'operation_type')
+
+class WishlistRecommendationAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'wishlist_id', 'recommendations', 'generated_at')
+    search_fields = ('wishlist_id',)
+
+class WishlistAnalyticsAdmin(admin.ModelAdmin):
+    list_display = ('analytics_id', 'wishlist_id', 'views', 'engagement', 'conversion_rate', 'updated_at')
+    search_fields = ('wishlist_id',)
+
+class WishlistSettingAdmin(admin.ModelAdmin):
+    list_display = ('setting_id', 'wishlist_id', 'settings', 'updated_at')
+    search_fields = ('wishlist_id',)
+
+class WishlistSyncAdmin(admin.ModelAdmin):
+    list_display = ('sync_id', 'user_id', 'devices', 'last_synced_at')
+    search_fields = ('user_id',)
+
+class WishlistBackupRestoreAdmin(admin.ModelAdmin):
+    list_display = ('backup_restore_id', 'wishlist_id', 'operation_type', 'status', 'created_at', 'completed_at')
+    search_fields = ('wishlist_id', 'operation_type')
+
+admin.site.register(Wishlist, WishlistAdmin)
+admin.site.register(WishlistItem, WishlistItemAdmin)
+admin.site.register(WishlistSharing, WishlistSharingAdmin)
+admin.site.register(WishlistPrivacy, WishlistPrivacyAdmin)
+admin.site.register(WishlistNotification, WishlistNotificationAdmin)
+admin.site.register(WishlistCollaborator, WishlistCollaboratorAdmin)
+admin.site.register(WishlistNote, WishlistNoteAdmin)
+admin.site.register(WishlistRating, WishlistRatingAdmin)
+admin.site.register(WishlistReview, WishlistReviewAdmin)
+admin.site.register(WishlistImportExport, WishlistImportExportAdmin)
+admin.site.register(WishlistRecommendation, WishlistRecommendationAdmin)
+admin.site.register(WishlistAnalytics, WishlistAnalyticsAdmin)
+admin.site.register(WishlistSetting, WishlistSettingAdmin)
+admin.site.register(WishlistSync, WishlistSyncAdmin)
+admin.site.register(WishlistBackupRestore, WishlistBackupRestoreAdmin)
+EOF
+
+# Step 4: Create Django migrations
+python manage.py makemigrations WishlistManagement
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Step 1: Create Django app
+python manage.py startapp ReviewsAndRatings
+
+# Add the new app to INSTALLED_APPS in settings.py
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'ReviewsAndRatings'," $SETTINGS_FILE
+
+# Step 2: Create Django models for each table
+
+# Reviews and Ratings models
+cat <<EOF > ReviewsAndRatings/models.py
+from django.db import models
+
+class Review(models.Model):
+    review_id = models.AutoField(primary_key=True)
+    product_id = models.IntegerField()
+    user_id = models.IntegerField()
+    rating = models.IntegerField()
+    review_text = models.TextField()
+    status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ReviewReply(models.Model):
+    reply_id = models.AutoField(primary_key=True)
+    review_id = models.ForeignKey(Review, on_delete=models.CASCADE)
+    user_id = models.IntegerField()
+    reply_text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ReviewFilter(models.Model):
+    filter_id = models.AutoField(primary_key=True)
+    criteria = models.CharField(max_length=255)
+    sort_order = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class ReviewReport(models.Model):
+    report_id = models.AutoField(primary_key=True)
+    review_id = models.ForeignKey(Review, on_delete=models.CASCADE)
+    report_reason = models.CharField(max_length=255)
+    status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ReviewNotification(models.Model):
+    notification_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    subscribed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class ReviewAnalytics(models.Model):
+    analytics_id = models.AutoField(primary_key=True)
+    review_id = models.ForeignKey(Review, on_delete=models.CASCADE)
+    views = models.IntegerField()
+    engagement = models.IntegerField()
+    sentiment = models.CharField(max_length=255)
+    trend = models.CharField(max_length=255)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ReviewImportExport(models.Model):
+    operation_id = models.AutoField(primary_key=True)
+    operation_type = models.CharField(max_length=20)
+    date_range = models.CharField(max_length=255)
+    status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+class ReviewResponseTemplate(models.Model):
+    template_id = models.AutoField(primary_key=True)
+    template_name = models.CharField(max_length=255)
+    template_text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ReviewAggregation(models.Model):
+    aggregation_id = models.AutoField(primary_key=True)
+    product_id = models.IntegerField()
+    summary = models.TextField()
+    sentiment = models.CharField(max_length=255)
+    trends = models.TextField()
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ReviewIntegration(models.Model):
+    integration_id = models.AutoField(primary_key=True)
+    platform_name = models.CharField(max_length=255)
+    details = models.JSONField()
+    status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ReviewGamification(models.Model):
+    gamification_id = models.AutoField(primary_key=True)
+    settings = models.JSONField()
+    leaderboard = models.JSONField()
+    rewards = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ReviewAuthentication(models.Model):
+    auth_id = models.AutoField(primary_key=True)
+    review_id = models.ForeignKey(Review, on_delete=models.CASCADE)
+    verification_token = models.CharField(max_length=255)
+    status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    verified_at = models.DateTimeField(null=True, blank=True)
+EOF
+
+# Step 3: Register models with Django admin
+cat <<EOF > ReviewsAndRatings/admin.py
+from django.contrib import admin
+from .models import (
+    Review, ReviewReply, ReviewFilter, ReviewReport, ReviewNotification, 
+    ReviewAnalytics, ReviewImportExport, ReviewResponseTemplate, ReviewAggregation, 
+    ReviewIntegration, ReviewGamification, ReviewAuthentication
+)
+
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('review_id', 'product_id', 'user_id', 'rating', 'status', 'created_at', 'updated_at')
+    search_fields = ('product_id', 'user_id', 'status')
+    list_filter = ('status',)
+
+class ReviewReplyAdmin(admin.ModelAdmin):
+    list_display = ('reply_id', 'review_id', 'user_id', 'reply_text', 'created_at', 'updated_at')
+    search_fields = ('review_id', 'user_id')
+
+class ReviewFilterAdmin(admin.ModelAdmin):
+    list_display = ('filter_id', 'criteria', 'sort_order', 'created_at')
+    search_fields = ('criteria',)
+
+class ReviewReportAdmin(admin.ModelAdmin):
+    list_display = ('report_id', 'review_id', 'report_reason', 'status', 'created_at', 'updated_at')
+    search_fields = ('review_id', 'status')
+    list_filter = ('status',)
+
+class ReviewNotificationAdmin(admin.ModelAdmin):
+    list_display = ('notification_id', 'user_id', 'subscribed', 'created_at')
+    search_fields = ('user_id',)
+
+class ReviewAnalyticsAdmin(admin.ModelAdmin):
+    list_display = ('analytics_id', 'review_id', 'views', 'engagement', 'sentiment', 'trend', 'updated_at')
+    search_fields = ('review_id',)
+
+class ReviewImportExportAdmin(admin.ModelAdmin):
+    list_display = ('operation_id', 'operation_type', 'date_range', 'status', 'created_at', 'completed_at')
+    search_fields = ('operation_type', 'status')
+
+class ReviewResponseTemplateAdmin(admin.ModelAdmin):
+    list_display = ('template_id', 'template_name', 'template_text', 'created_at', 'updated_at')
+    search_fields = ('template_name',)
+
+class ReviewAggregationAdmin(admin.ModelAdmin):
+    list_display = ('aggregation_id', 'product_id', 'summary', 'sentiment', 'trends', 'updated_at')
+    search_fields = ('product_id', 'sentiment')
+
+class ReviewIntegrationAdmin(admin.ModelAdmin):
+    list_display = ('integration_id', 'platform_name', 'details', 'status', 'created_at', 'updated_at')
+    search_fields = ('platform_name', 'status')
+
+class ReviewGamificationAdmin(admin.ModelAdmin):
+    list_display = ('gamification_id', 'settings', 'leaderboard', 'rewards', 'created_at', 'updated_at')
+    search_fields = ('settings',)
+
+class ReviewAuthenticationAdmin(admin.ModelAdmin):
+    list_display = ('auth_id', 'review_id', 'verification_token', 'status', 'created_at', 'verified_at')
+    search_fields = ('review_id', 'status')
+
+admin.site.register(Review, ReviewAdmin)
+admin.site.register(ReviewReply, ReviewReplyAdmin)
+admin.site.register(ReviewFilter, ReviewFilterAdmin)
+admin.site.register(ReviewReport, ReviewReportAdmin)
+admin.site.register(ReviewNotification, ReviewNotificationAdmin)
+admin.site.register(ReviewAnalytics, ReviewAnalyticsAdmin)
+admin.site.register(ReviewImportExport, ReviewImportExportAdmin)
+admin.site.register(ReviewResponseTemplate, ReviewResponseTemplateAdmin)
+admin.site.register(ReviewAggregation, ReviewAggregationAdmin)
+admin.site.register(ReviewIntegration, ReviewIntegrationAdmin)
+admin.site.register(ReviewGamification, ReviewGamificationAdmin)
+admin.site.register(ReviewAuthentication, ReviewAuthenticationAdmin)
+EOF
+
+# Step 4: Create Django migrations
+python manage.py makemigrations ReviewsAndRatings
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Step 1: Create Django app
+python manage.py startapp Recommendations
+
+# Add the new app to INSTALLED_APPS in settings.py
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'Recommendations'," $SETTINGS_FILE
+
+# Step 2: Create Django models for each table
+
+# Recommendations models
+cat <<EOF > Recommendations/models.py
+from django.db import models
+
+class PersonalizedRecommendation(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    product_ids = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SimilarProduct(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    product_id = models.IntegerField()
+    similar_product_ids = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class TrendingProduct(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    product_ids = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class NewArrival(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    category_id = models.IntegerField()
+    product_ids = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class Bestseller(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    category_id = models.IntegerField()
+    product_ids = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CrossSellProduct(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    product_id = models.IntegerField()
+    cross_sell_product_ids = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class UpSellProduct(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    product_id = models.IntegerField()
+    up_sell_product_ids = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class FrequentlyBoughtTogether(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    product_id = models.IntegerField()
+    frequently_bought_together_product_ids = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CustomerBasedRecommendation(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    product_ids = models.JSONField()
+    recommendation_type = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class DynamicPricingRecommendation(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    product_ids = models.JSONField()
+    pricing_details = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class RecommendationRule(models.Model):
+    rule_id = models.AutoField(primary_key=True)
+    rule_details = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class RealTimeRecommendationUpdate(models.Model):
+    update_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    product_ids = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SegmentBasedRecommendation(models.Model):
+    segment_id = models.AutoField(primary_key=True)
+    product_ids = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class FeedbackRecommendation(models.Model):
+    feedback_id = models.AutoField(primary_key=True)
+    product_id = models.IntegerField()
+    feedback_details = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class RecommendationPerformanceAnalytics(models.Model):
+    analytics_id = models.AutoField(primary_key=True)
+    product_id = models.IntegerField()
+    views = models.IntegerField()
+    conversions = models.IntegerField()
+    click_through_rate = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CustomerSpecificRecommendation(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    product_ids = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+EOF
+
+# Step 3: Register models with Django admin
+cat <<EOF > Recommendations/admin.py
+from django.contrib import admin
+from .models import (
+    PersonalizedRecommendation, SimilarProduct, TrendingProduct, NewArrival, Bestseller, 
+    CrossSellProduct, UpSellProduct, FrequentlyBoughtTogether, CustomerBasedRecommendation, 
+    DynamicPricingRecommendation, RecommendationRule, RealTimeRecommendationUpdate, 
+    SegmentBasedRecommendation, FeedbackRecommendation, RecommendationPerformanceAnalytics, 
+    CustomerSpecificRecommendation
+)
+
+class PersonalizedRecommendationAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'customer_id', 'created_at', 'updated_at')
+    search_fields = ('customer_id',)
+
+class SimilarProductAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'product_id', 'created_at', 'updated_at')
+    search_fields = ('product_id',)
+
+class TrendingProductAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'created_at', 'updated_at')
+
+class NewArrivalAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'category_id', 'created_at', 'updated_at')
+    search_fields = ('category_id',)
+
+class BestsellerAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'category_id', 'created_at', 'updated_at')
+    search_fields = ('category_id',)
+
+class CrossSellProductAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'product_id', 'created_at', 'updated_at')
+    search_fields = ('product_id',)
+
+class UpSellProductAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'product_id', 'created_at', 'updated_at')
+    search_fields = ('product_id',)
+
+class FrequentlyBoughtTogetherAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'product_id', 'created_at', 'updated_at')
+    search_fields = ('product_id',)
+
+class CustomerBasedRecommendationAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'customer_id', 'recommendation_type', 'created_at', 'updated_at')
+    search_fields = ('customer_id', 'recommendation_type')
+
+class DynamicPricingRecommendationAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'customer_id', 'created_at', 'updated_at')
+    search_fields = ('customer_id',)
+
+class RecommendationRuleAdmin(admin.ModelAdmin):
+    list_display = ('rule_id', 'created_at', 'updated_at')
+
+class RealTimeRecommendationUpdateAdmin(admin.ModelAdmin):
+    list_display = ('update_id', 'customer_id', 'created_at', 'updated_at')
+    search_fields = ('customer_id',)
+
+class SegmentBasedRecommendationAdmin(admin.ModelAdmin):
+    list_display = ('segment_id', 'created_at', 'updated_at')
+
+class FeedbackRecommendationAdmin(admin.ModelAdmin):
+    list_display = ('feedback_id', 'product_id', 'created_at', 'updated_at')
+    search_fields = ('product_id',)
+
+class RecommendationPerformanceAnalyticsAdmin(admin.ModelAdmin):
+    list_display = ('analytics_id', 'product_id', 'views', 'conversions', 'click_through_rate', 'created_at', 'updated_at')
+    search_fields = ('product_id',)
+
+class CustomerSpecificRecommendationAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'customer_id', 'created_at', 'updated_at')
+    search_fields = ('customer_id',)
+
+admin.site.register(PersonalizedRecommendation, PersonalizedRecommendationAdmin)
+admin.site.register(SimilarProduct, SimilarProductAdmin)
+admin.site.register(TrendingProduct, TrendingProductAdmin)
+admin.site.register(NewArrival, NewArrivalAdmin)
+admin.site.register(Bestseller, BestsellerAdmin)
+admin.site.register(CrossSellProduct, CrossSellProductAdmin)
+admin.site.register(UpSellProduct, UpSellProductAdmin)
+admin.site.register(FrequentlyBoughtTogether, FrequentlyBoughtTogetherAdmin)
+admin.site.register(CustomerBasedRecommendation, CustomerBasedRecommendationAdmin)
+admin.site.register(DynamicPricingRecommendation, DynamicPricingRecommendationAdmin)
+admin.site.register(RecommendationRule, RecommendationRuleAdmin)
+admin.site.register(RealTimeRecommendationUpdate, RealTimeRecommendationUpdateAdmin)
+admin.site.register(SegmentBasedRecommendation, SegmentBasedRecommendationAdmin)
+admin.site.register(FeedbackRecommendation, FeedbackRecommendationAdmin)
+admin.site.register(RecommendationPerformanceAnalytics, RecommendationPerformanceAnalyticsAdmin)
+admin.site.register(CustomerSpecificRecommendation, CustomerSpecificRecommendationAdmin)
+EOF
+
+# Step 4: Create Django migrations
+python manage.py makemigrations Recommendations
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Step 1: Create Django app
+python manage.py startapp CartManagement
+
+# Add the new app to INSTALLED_APPS in settings.py
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'CartManagement'," $SETTINGS_FILE
+
+# Step 2: Create Django models for each table
+
+# Cart Management models
+cat <<EOF > CartManagement/models.py
+from django.db import models
+from django.contrib.auth.models import User
+
+class Cart(models.Model):
+    cart_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartItems(models.Model):
+    item_id = models.AutoField(primary_key=True)
+    cart_id = models.IntegerField()
+    product_id = models.IntegerField()
+    quantity = models.IntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartItemDetails(models.Model):
+    detail_id = models.AutoField(primary_key=True)
+    item_id = models.IntegerField()
+    product_name = models.CharField(max_length=255)
+    product_description = models.TextField()
+    product_image_url = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartDiscounts(models.Model):
+    discount_id = models.AutoField(primary_key=True)
+    cart_id = models.IntegerField()
+    discount_code = models.CharField(max_length=50)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartPromotions(models.Model):
+    promotion_id = models.AutoField(primary_key=True)
+    cart_id = models.IntegerField()
+    promotion_code = models.CharField(max_length=50)
+    promotion_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartItemNotes(models.Model):
+    note_id = models.AutoField(primary_key=True)
+    item_id = models.IntegerField()
+    note_text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartSharing(models.Model):
+    share_id = models.AutoField(primary_key=True)
+    cart_id = models.IntegerField()
+    shared_with_user_id = models.IntegerField()
+    status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartSaveForLater(models.Model):
+    save_for_later_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    product_id = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartExpiration(models.Model):
+    cart_id = models.OneToOneField(Cart, on_delete=models.CASCADE, primary_key=True)
+    expiration_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartPersistence(models.Model):
+    user_id = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    is_persistent = models.BooleanField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartRecommendations(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    recommended_product_ids = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartRecovery(models.Model):
+    recovery_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    recovery_status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartItemCustomization(models.Model):
+    customization_id = models.AutoField(primary_key=True)
+    item_id = models.IntegerField()
+    customization_details = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartItemSubscription(models.Model):
+    subscription_id = models.AutoField(primary_key=True)
+    item_id = models.IntegerField()
+    subscription_status = models.CharField(max_length=50)
+    recurring_billing_details = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+EOF
+
+# Step 3: Register models with Django admin
+cat <<EOF > CartManagement/admin.py
+from django.contrib import admin
+from .models import Cart, CartItems, CartItemDetails, CartDiscounts, CartPromotions, \
+                    CartItemNotes, CartSharing, CartSaveForLater, CartExpiration, \
+                    CartPersistence, CartRecommendations, CartRecovery, \
+                    CartItemCustomization, CartItemSubscription
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('cart_id', 'user_id', 'created_at', 'updated_at')
+
+@admin.register(CartItems)
+class CartItemsAdmin(admin.ModelAdmin):
+    list_display = ('item_id', 'cart_id', 'product_id', 'quantity', 'price', 'created_at', 'updated_at')
+
+@admin.register(CartItemDetails)
+class CartItemDetailsAdmin(admin.ModelAdmin):
+    list_display = ('detail_id', 'item_id', 'product_name', 'product_description', 'product_image_url', 'created_at', 'updated_at')
+
+@admin.register(CartDiscounts)
+class CartDiscountsAdmin(admin.ModelAdmin):
+    list_display = ('discount_id', 'cart_id', 'discount_code', 'discount_amount', 'created_at', 'updated_at')
+
+@admin.register(CartPromotions)
+class CartPromotionsAdmin(admin.ModelAdmin):
+    list_display = ('promotion_id', 'cart_id', 'promotion_code', 'promotion_amount', 'created_at', 'updated_at')
+
+@admin.register(CartItemNotes)
+class CartItemNotesAdmin(admin.ModelAdmin):
+    list_display = ('note_id', 'item_id', 'note_text', 'created_at', 'updated_at')
+
+@admin.register(CartSharing)
+class CartSharingAdmin(admin.ModelAdmin):
+    list_display = ('share_id', 'cart_id', 'shared_with_user_id', 'status', 'created_at', 'updated_at')
+
+@admin.register(CartSaveForLater)
+class CartSaveForLaterAdmin(admin.ModelAdmin):
+    list_display = ('save_for_later_id', 'user_id', 'product_id', 'created_at', 'updated_at')
+
+@admin.register(CartExpiration)
+class CartExpirationAdmin(admin.ModelAdmin):
+    list_display = ('cart_id', 'expiration_date', 'created_at', 'updated_at')
+
+@admin.register(CartPersistence)
+class CartPersistenceAdmin(admin.ModelAdmin):
+    list_display = ('user_id', 'is_persistent', 'created_at', 'updated_at')
+
+@admin.register(CartRecommendations)
+class CartRecommendationsAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'user_id', 'recommended_product_ids', 'created_at', 'updated_at')
+
+@admin.register(CartRecovery)
+class CartRecoveryAdmin(admin.ModelAdmin):
+    list_display = ('recovery_id', 'user_id', 'recovery_status', 'created_at', 'updated_at')
+
+@admin.register(CartItemCustomization)
+class CartItemCustomizationAdmin(admin.ModelAdmin):
+    list_display = ('customization_id', 'item_id', 'customization_details', 'created_at', 'updated_at')
+
+@admin.register(CartItemSubscription)
+class CartItemSubscriptionAdmin(admin.ModelAdmin):
+    list_display = ('subscription_id', 'item_id', 'subscription_status', 'recurring_billing_details', 'created_at', 'updated_at')
+
+EOF
+
+# Step 4: Create Django migrations
+python manage.py makemigrations CartManagement
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Create Django app
+python manage.py startapp SubscriptionManagement
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'SubscriptionManagement'," $SETTINGS_FILE
+
+# Add the following code for defining models based on the provided tables
+
+cat <<EOF > SubscriptionManagement/models.py
+from django.db import models
+
+class Subscriptions(models.Model):
+    subscription_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    plan_id = models.IntegerField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    status = models.CharField(max_length=50)
+    billing_cycle = models.CharField(max_length=50)
+    next_billing_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SubscriptionPlans(models.Model):
+    plan_id = models.AutoField(primary_key=True)
+    plan_name = models.CharField(max_length=255)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=10)
+    billing_cycle = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SubscriptionCancellationReasons(models.Model):
+    reason_id = models.AutoField(primary_key=True)
+    reason_text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SubscriptionRenewalReminders(models.Model):
+    reminder_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    reminder_date = models.DateTimeField()
+    reminder_status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SubscriptionPaymentMethods(models.Model):
+    method_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    payment_method_type = models.CharField(max_length=50)
+    payment_details = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SubscriptionUsageTracking(models.Model):
+    usage_id = models.AutoField(primary_key=True)
+    subscription_id = models.IntegerField()
+    usage_details = models.JSONField()
+    usage_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SubscriptionAnalytics(models.Model):
+    analytics_id = models.AutoField(primary_key=True)
+    subscription_id = models.IntegerField()
+    metric_name = models.CharField(max_length=255)
+    metric_value = models.DecimalField(max_digits=10, decimal_places=2)
+    metric_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SubscriptionDiscounts(models.Model):
+    discount_id = models.AutoField(primary_key=True)
+    subscription_id = models.IntegerField()
+    discount_code = models.CharField(max_length=50)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SubscriptionCustomizationOptions(models.Model):
+    option_id = models.AutoField(primary_key=True)
+    subscription_id = models.IntegerField()
+    option_name = models.CharField(max_length=255)
+    option_value = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+EOF
+
+
+# Open admin.py in a text editor
+# Add the following code to register the models in the Django admin
+
+cat <<EOF > SubscriptionManagement/admin.py
+from django.contrib import admin
+from .models import (
+    Subscriptions, SubscriptionPlans, SubscriptionCancellationReasons,
+    SubscriptionRenewalReminders, SubscriptionPaymentMethods,
+    SubscriptionUsageTracking, SubscriptionAnalytics, SubscriptionDiscounts,
+    SubscriptionCustomizationOptions
+)
+
+@admin.register(Subscriptions)
+class SubscriptionsAdmin(admin.ModelAdmin):
+    list_display = ('subscription_id', 'user_id', 'plan_id', 'start_date', 'end_date', 'status', 'billing_cycle', 'next_billing_date', 'created_at', 'updated_at')
+    search_fields = ('user_id', 'plan_id', 'status', 'billing_cycle')
+    list_filter = ('status', 'billing_cycle')
+
+@admin.register(SubscriptionPlans)
+class SubscriptionPlansAdmin(admin.ModelAdmin):
+    list_display = ('plan_id', 'plan_name', 'description', 'price', 'currency', 'billing_cycle', 'created_at', 'updated_at')
+    search_fields = ('plan_name', 'description', 'price', 'currency', 'billing_cycle')
+    list_filter = ('currency', 'billing_cycle')
+
+@admin.register(SubscriptionCancellationReasons)
+class SubscriptionCancellationReasonsAdmin(admin.ModelAdmin):
+    list_display = ('reason_id', 'reason_text', 'created_at', 'updated_at')
+    search_fields = ('reason_text',)
+    list_filter = ('created_at', 'updated_at')
+
+@admin.register(SubscriptionRenewalReminders)
+class SubscriptionRenewalRemindersAdmin(admin.ModelAdmin):
+    list_display = ('reminder_id', 'user_id', 'reminder_date', 'reminder_status', 'created_at', 'updated_at')
+    search_fields = ('user_id', 'reminder_status')
+    list_filter = ('reminder_status', 'created_at', 'updated_at')
+
+@admin.register(SubscriptionPaymentMethods)
+class SubscriptionPaymentMethodsAdmin(admin.ModelAdmin):
+    list_display = ('method_id', 'user_id', 'payment_method_type', 'payment_details', 'created_at', 'updated_at')
+    search_fields = ('user_id', 'payment_method_type')
+    list_filter = ('payment_method_type', 'created_at', 'updated_at')
+
+@admin.register(SubscriptionUsageTracking)
+class SubscriptionUsageTrackingAdmin(admin.ModelAdmin):
+    list_display = ('usage_id', 'subscription_id', 'usage_details', 'usage_date', 'created_at', 'updated_at')
+    search_fields = ('subscription_id',)
+    list_filter = ('usage_date', 'created_at', 'updated_at')
+
+@admin.register(SubscriptionAnalytics)
+class SubscriptionAnalyticsAdmin(admin.ModelAdmin):
+    list_display = ('analytics_id', 'subscription_id', 'metric_name', 'metric_value', 'metric_date', 'created_at', 'updated_at')
+    search_fields = ('subscription_id', 'metric_name')
+    list_filter = ('metric_name', 'metric_date', 'created_at', 'updated_at')
+
+@admin.register(SubscriptionDiscounts)
+class SubscriptionDiscountsAdmin(admin.ModelAdmin):
+    list_display = ('discount_id', 'subscription_id', 'discount_code', 'discount_amount', 'created_at', 'updated_at')
+    search_fields = ('subscription_id', 'discount_code')
+    list_filter = ('created_at', 'updated_at')
+
+@admin.register(SubscriptionCustomizationOptions)
+class SubscriptionCustomizationOptionsAdmin(admin.ModelAdmin):
+    list_display = ('option_id', 'subscription_id', 'option_name', 'option_value', 'created_at', 'updated_at')
+    search_fields = ('subscription_id', 'option_name', 'option_value')
+    list_filter = ('created_at', 'updated_at')
+EOF
+
+# Step 4: Create Django migrations
+python manage.py makemigrations SubscriptionManagement
+
+# Display success message
+echo "SubscriptionManagement app created with models and registered in Django admin."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Create Django app
+python manage.py startapp GiftCardManagement
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'GiftCardManagement'," $SETTINGS_FILE
+
+# Add the following code for defining models based on the provided tables
+
+cat <<EOF > GiftCardManagement/models.py
+from django.db import models
+
+class GiftCards(models.Model):
+    gift_card_id = models.AutoField(primary_key=True)
+    recipient_id = models.IntegerField()
+    card_code = models.CharField(max_length=50)
+    balance = models.DecimalField(max_digits=10, decimal_places=2)
+    activation_date = models.DateTimeField()
+    expiration_date = models.DateTimeField()
+    status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class GiftCardTransactions(models.Model):
+    transaction_id = models.AutoField(primary_key=True)
+    gift_card_id = models.IntegerField()
+    transaction_type = models.CharField(max_length=50)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    transaction_date = models.DateTimeField()
+    transaction_details = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class GiftCardNotifications(models.Model):
+    notification_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    gift_card_id = models.IntegerField()
+    subscription_status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class POSIntegrationConfiguration(models.Model):
+    pos_id = models.AutoField(primary_key=True)
+    pos_name = models.CharField(max_length=255)
+    configuration_details = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class GiftCardRedemptionOptions(models.Model):
+    redemption_id = models.AutoField(primary_key=True)
+    gift_card_id = models.IntegerField()
+    redemption_option = models.CharField(max_length=255)
+    redemption_details = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class GiftCardCustomizationOptions(models.Model):
+    customization_id = models.AutoField(primary_key=True)
+    gift_card_id = models.IntegerField()
+    customization_option = models.CharField(max_length=255)
+    customization_value = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+EOF
+
+
+cat <<EOF > GiftCardManagement/admin.py
+from django.contrib import admin
+from .models import (
+    GiftCards, GiftCardTransactions, GiftCardNotifications,
+    POSIntegrationConfiguration, GiftCardRedemptionOptions,
+    GiftCardCustomizationOptions
+)
+
+@admin.register(GiftCards)
+class GiftCardsAdmin(admin.ModelAdmin):
+    list_display = ('gift_card_id', 'recipient_id', 'card_code', 'balance', 'activation_date', 'expiration_date', 'status', 'created_at', 'updated_at')
+    search_fields = ('recipient_id', 'card_code', 'status')
+    list_filter = ('status', 'activation_date', 'expiration_date')
+
+@admin.register(GiftCardTransactions)
+class GiftCardTransactionsAdmin(admin.ModelAdmin):
+    list_display = ('transaction_id', 'gift_card_id', 'transaction_type', 'amount', 'transaction_date', 'created_at', 'updated_at')
+    search_fields = ('gift_card_id', 'transaction_type')
+    list_filter = ('transaction_type', 'transaction_date')
+
+@admin.register(GiftCardNotifications)
+class GiftCardNotificationsAdmin(admin.ModelAdmin):
+    list_display = ('notification_id', 'user_id', 'gift_card_id', 'subscription_status', 'created_at', 'updated_at')
+    search_fields = ('user_id', 'gift_card_id', 'subscription_status')
+    list_filter = ('subscription_status', 'created_at', 'updated_at')
+
+@admin.register(POSIntegrationConfiguration)
+class POSIntegrationConfigurationAdmin(admin.ModelAdmin):
+    list_display = ('pos_id', 'pos_name', 'created_at', 'updated_at')
+    search_fields = ('pos_name',)
+    list_filter = ('created_at', 'updated_at')
+
+@admin.register(GiftCardRedemptionOptions)
+class GiftCardRedemptionOptionsAdmin(admin.ModelAdmin):
+    list_display = ('redemption_id', 'gift_card_id', 'redemption_option', 'created_at', 'updated_at')
+    search_fields = ('gift_card_id', 'redemption_option')
+    list_filter = ('created_at', 'updated_at')
+
+@admin.register(GiftCardCustomizationOptions)
+class GiftCardCustomizationOptionsAdmin(admin.ModelAdmin):
+    list_display = ('customization_id', 'gift_card_id', 'customization_option', 'customization_value', 'created_at', 'updated_at')
+    search_fields = ('gift_card_id', 'customization_option', 'customization_value')
+    list_filter = ('created_at', 'updated_at')
+EOF
+
+# Display success message
+echo "GiftCardManagement app created with models and registered in Django admin."
+
+
+
+
+
+
+
+
+
+
+
+
+# Create Django app
+python manage.py startapp OrderTracking
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'OrderTracking'," $SETTINGS_FILE
+
+# Add the models to models.py
+cat <<EOF > OrderTracking/models.py
+from django.db import models
+
+class OrderTracking(models.Model):
+    order_id = models.IntegerField(primary_key=True)
+    current_status = models.CharField(max_length=255)
+    estimated_delivery_date = models.DateTimeField()
+    real_time_tracking_url = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class TrackingUpdates(models.Model):
+    update_id = models.AutoField(primary_key=True)
+    order_id = models.ForeignKey(OrderTracking, on_delete=models.CASCADE)
+    status_update = models.CharField(max_length=255)
+    timestamp = models.DateTimeField()
+    location = models.CharField(max_length=255)
+    additional_info = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class DeliveryRoutes(models.Model):
+    route_id = models.AutoField(primary_key=True)
+    order_id = models.ForeignKey(OrderTracking, on_delete=models.CASCADE)
+    route_details = models.JSONField()
+    map_url = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ProofOfDelivery(models.Model):
+    pod_id = models.AutoField(primary_key=True)
+    order_id = models.ForeignKey(OrderTracking, on_delete=models.CASCADE)
+    pod_details = models.TextField()
+    pod_file_url = models.CharField(max_length=255)
+    uploaded_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class DeliveryNotifications(models.Model):
+    notification_id = models.AutoField(primary_key=True)
+    order_id = models.ForeignKey(OrderTracking, on_delete=models.CASCADE)
+    notification_type = models.CharField(max_length=255)
+    sent_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class DeliveryIssues(models.Model):
+    issue_id = models.AutoField(primary_key=True)
+    order_id = models.ForeignKey(OrderTracking, on_delete=models.CASCADE)
+    issue_description = models.TextField()
+    reported_at = models.DateTimeField()
+    status = models.CharField(max_length=50)
+    resolution_details = models.TextField(null=True, blank=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CarrierIntegration(models.Model):
+    carrier_id = models.AutoField(primary_key=True)
+    carrier_name = models.CharField(max_length=255)
+    tracking_url = models.CharField(max_length=255)
+    additional_details = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class DeliveryHistory(models.Model):
+    history_id = models.AutoField(primary_key=True)
+    order_id = models.ForeignKey(OrderTracking, on_delete=models.CASCADE)
+    event_details = models.TextField()
+    event_timestamp = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class DeliverySignatures(models.Model):
+    signature_id = models.AutoField(primary_key=True)
+    order_id = models.ForeignKey(OrderTracking, on_delete=models.CASCADE)
+    signature_url = models.CharField(max_length=255)
+    uploaded_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+EOF
+
+
+
+# Add the admin registration to admin.py
+cat <<EOF > OrderTracking/admin.py
+from django.contrib import admin
+from .models import OrderTracking, TrackingUpdates, DeliveryRoutes, ProofOfDelivery, DeliveryNotifications, DeliveryIssues, CarrierIntegration, DeliveryHistory, DeliverySignatures
+
+class OrderTrackingAdmin(admin.ModelAdmin):
+    list_display = ('order_id', 'current_status', 'estimated_delivery_date', 'real_time_tracking_url', 'created_at', 'updated_at')
+    search_fields = ('order_id', 'current_status')
+
+class TrackingUpdatesAdmin(admin.ModelAdmin):
+    list_display = ('update_id', 'order_id', 'status_update', 'timestamp', 'location', 'created_at', 'updated_at')
+    search_fields = ('order_id', 'status_update')
+
+class DeliveryRoutesAdmin(admin.ModelAdmin):
+    list_display = ('route_id', 'order_id', 'route_details', 'map_url', 'created_at', 'updated_at')
+    search_fields = ('order_id', 'route_details')
+
+class ProofOfDeliveryAdmin(admin.ModelAdmin):
+    list_display = ('pod_id', 'order_id', 'pod_details', 'pod_file_url', 'uploaded_at', 'created_at', 'updated_at')
+    search_fields = ('order_id', 'pod_details')
+
+class DeliveryNotificationsAdmin(admin.ModelAdmin):
+    list_display = ('notification_id', 'order_id', 'notification_type', 'sent_at', 'created_at', 'updated_at')
+    search_fields = ('order_id', 'notification_type')
+
+class DeliveryIssuesAdmin(admin.ModelAdmin):
+    list_display = ('issue_id', 'order_id', 'issue_description', 'reported_at', 'status', 'resolved_at', 'created_at', 'updated_at')
+    search_fields = ('order_id', 'issue_description')
+
+class CarrierIntegrationAdmin(admin.ModelAdmin):
+    list_display = ('carrier_id', 'carrier_name', 'tracking_url', 'created_at', 'updated_at')
+    search_fields = ('carrier_name',)
+
+class DeliveryHistoryAdmin(admin.ModelAdmin):
+    list_display = ('history_id', 'order_id', 'event_details', 'event_timestamp', 'created_at', 'updated_at')
+    search_fields = ('order_id', 'event_details')
+
+class DeliverySignaturesAdmin(admin.ModelAdmin):
+    list_display = ('signature_id', 'order_id', 'signature_url', 'uploaded_at', 'created_at', 'updated_at')
+    search_fields = ('order_id',)
+
+admin.site.register(OrderTracking, OrderTrackingAdmin)
+admin.site.register(TrackingUpdates, TrackingUpdatesAdmin)
+admin.site.register(DeliveryRoutes, DeliveryRoutesAdmin)
+admin.site.register(ProofOfDelivery, ProofOfDeliveryAdmin)
+admin.site.register(DeliveryNotifications, DeliveryNotificationsAdmin)
+admin.site.register(DeliveryIssues, DeliveryIssuesAdmin)
+admin.site.register(CarrierIntegration, CarrierIntegrationAdmin)
+admin.site.register(DeliveryHistory, DeliveryHistoryAdmin)
+admin.site.register(DeliverySignatures, DeliverySignaturesAdmin)
+EOF
+
+# Display success message
+echo "OrderTracking app created with models and registered in Django admin."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#!/bin/bash
+
+# Create Django app
+python manage.py startapp CustomerSupport
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'CustomerSupport'," $SETTINGS_FILE
+
+# Add the models to models.py
+cat <<EOF > CustomerSupport/models.py
+from django.db import models
+
+class LiveChatSession(models.Model):
+    session_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    agent_id = models.IntegerField()
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ChatHistory(models.Model):
+    message_id = models.AutoField(primary_key=True)
+    session_id = models.ForeignKey(LiveChatSession, on_delete=models.CASCADE)
+    sender_id = models.IntegerField()
+    message_content = models.TextField()
+    sent_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class AgentAvailability(models.Model):
+    agent_id = models.IntegerField(primary_key=True)
+    available = models.BooleanField()
+    available_from = models.DateTimeField()
+    available_to = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SupportTicket(models.Model):
+    ticket_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    subject = models.CharField(max_length=255)
+    description = models.TextField()
+    status = models.CharField(max_length=50)
+    priority = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class FAQ(models.Model):
+    faq_id = models.AutoField(primary_key=True)
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class KnowledgeBaseArticle(models.Model):
+    article_id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CustomerFeedback(models.Model):
+    feedback_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    ticket_id = models.IntegerField()
+    feedback_text = models.TextField()
+    response = models.TextField()
+    submitted_at = models.DateTimeField()
+    responded_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class Escalation(models.Model):
+    escalation_id = models.AutoField(primary_key=True)
+    ticket_id = models.IntegerField()
+    escalated_to = models.CharField(max_length=255)
+    reason = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SupportAnalytics(models.Model):
+    analytics_id = models.AutoField(primary_key=True)
+    type = models.CharField(max_length=50)
+    data = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SupportAvailability(models.Model):
+    date = models.DateField(primary_key=True)
+    availability = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SupportLanguage(models.Model):
+    language_id = models.AutoField(primary_key=True)
+    language_code = models.CharField(max_length=10)
+    language_name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SupportResource(models.Model):
+    resource_id = models.AutoField(primary_key=True)
+    type = models.CharField(max_length=50)
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class AgentPerformance(models.Model):
+    agent_id = models.IntegerField(primary_key=True)
+    performance_data = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SupportIntegration(models.Model):
+    integration_id = models.AutoField(primary_key=True)
+    type = models.CharField(max_length=50)
+    details = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+EOF
+
+
+# Add the admin registration to admin.py
+cat <<EOF > CustomerSupport/admin.py
+from django.contrib import admin
+from .models import LiveChatSession, ChatHistory, AgentAvailability, SupportTicket, FAQ, KnowledgeBaseArticle, CustomerFeedback, Escalation, SupportAnalytics, SupportAvailability, SupportLanguage, SupportResource, AgentPerformance, SupportIntegration
+
+class LiveChatSessionAdmin(admin.ModelAdmin):
+    list_display = ('session_id', 'customer_id', 'agent_id', 'start_time', 'end_time', 'status', 'created_at', 'updated_at')
+    search_fields = ('customer_id', 'agent_id', 'status')
+
+class ChatHistoryAdmin(admin.ModelAdmin):
+    list_display = ('message_id', 'session_id', 'sender_id', 'message_content', 'sent_at', 'created_at', 'updated_at')
+    search_fields = ('session_id', 'sender_id')
+
+class AgentAvailabilityAdmin(admin.ModelAdmin):
+    list_display = ('agent_id', 'available', 'available_from', 'available_to', 'created_at', 'updated_at')
+    search_fields = ('agent_id',)
+
+class SupportTicketAdmin(admin.ModelAdmin):
+    list_display = ('ticket_id', 'customer_id', 'subject', 'status', 'priority', 'created_at', 'updated_at')
+    search_fields = ('customer_id', 'subject', 'status', 'priority')
+
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ('faq_id', 'question', 'answer', 'created_at', 'updated_at')
+    search_fields = ('question',)
+
+class KnowledgeBaseArticleAdmin(admin.ModelAdmin):
+    list_display = ('article_id', 'title', 'content', 'created_at', 'updated_at')
+    search_fields = ('title',)
+
+class CustomerFeedbackAdmin(admin.ModelAdmin):
+    list_display = ('feedback_id', 'customer_id', 'ticket_id', 'feedback_text', 'response', 'submitted_at', 'responded_at', 'created_at', 'updated_at')
+    search_fields = ('customer_id', 'ticket_id', 'feedback_text')
+
+class EscalationAdmin(admin.ModelAdmin):
+    list_display = ('escalation_id', 'ticket_id', 'escalated_to', 'reason', 'created_at', 'updated_at')
+    search_fields = ('ticket_id', 'escalated_to')
+
+class SupportAnalyticsAdmin(admin.ModelAdmin):
+    list_display = ('analytics_id', 'type', 'data', 'created_at', 'updated_at')
+    search_fields = ('type',)
+
+class SupportAvailabilityAdmin(admin.ModelAdmin):
+    list_display = ('date', 'availability', 'created_at', 'updated_at')
+    search_fields = ('date',)
+
+class SupportLanguageAdmin(admin.ModelAdmin):
+    list_display = ('language_id', 'language_code', 'language_name', 'created_at', 'updated_at')
+    search_fields = ('language_code', 'language_name')
+
+class SupportResourceAdmin(admin.ModelAdmin):
+    list_display = ('resource_id', 'type', 'title', 'content', 'created_at', 'updated_at')
+    search_fields = ('type', 'title')
+
+class AgentPerformanceAdmin(admin.ModelAdmin):
+    list_display = ('agent_id', 'performance_data', 'created_at', 'updated_at')
+    search_fields = ('agent_id',)
+
+class SupportIntegrationAdmin(admin.ModelAdmin):
+    list_display = ('integration_id', 'type', 'details', 'created_at', 'updated_at')
+    search_fields = ('type',)
+
+admin.site.register(LiveChatSession, LiveChatSessionAdmin)
+admin.site.register(ChatHistory, ChatHistoryAdmin)
+admin.site.register(AgentAvailability, AgentAvailabilityAdmin)
+admin.site.register(SupportTicket, SupportTicketAdmin)
+admin.site.register(FAQ, FAQAdmin)
+admin.site.register(KnowledgeBaseArticle, KnowledgeBaseArticleAdmin)
+admin.site.register(CustomerFeedback, CustomerFeedbackAdmin)
+admin.site.register(Escalation, EscalationAdmin)
+admin.site.register(SupportAnalytics, SupportAnalyticsAdmin)
+admin.site.register(SupportAvailability, SupportAvailabilityAdmin)
+admin.site.register(SupportLanguage, SupportLanguageAdmin)
+admin.site.register(SupportResource, SupportResourceAdmin)
+admin.site.register(AgentPerformance, AgentPerformanceAdmin)
+admin.site.register(SupportIntegration, SupportIntegrationAdmin)
+EOF
+
+# Display success message
+echo "CustomerSupport app created with models and registered in Django admin."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#!/bin/bash
+
+# Create Django app
+python manage.py startapp SocialShare
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'SocialShare'," $SETTINGS_FILE
+
+
+
+# Add the models to models.py
+cat <<EOF > SocialShare/models.py
+from django.db import models
+
+class SocialShare(models.Model):
+    share_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    platform = models.CharField(max_length=50)
+    content_id = models.IntegerField()
+    share_url = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SocialAnalytics(models.Model):
+    analytics_id = models.AutoField(primary_key=True)
+    share_id = models.ForeignKey(SocialShare, on_delete=models.CASCADE)
+    views = models.IntegerField()
+    engagement = models.IntegerField()
+    conversions = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SocialLike(models.Model):
+    like_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    post_id = models.IntegerField()
+    action = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SocialComment(models.Model):
+    comment_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    post_id = models.IntegerField()
+    comment_text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SocialPrivacy(models.Model):
+    post_id = models.IntegerField(primary_key=True)
+    user_id = models.IntegerField()
+    privacy_level = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class UserSocialProfile(models.Model):
+    profile_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    platform = models.CharField(max_length=50)
+    share_count = models.IntegerField()
+    like_count = models.IntegerField()
+    comment_count = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SocialBadge(models.Model):
+    badge_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    badge_name = models.CharField(max_length=255)
+    earned_at = models.DateTimeField()
+
+class SocialReward(models.Model):
+    reward_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    reward_name = models.CharField(max_length=255)
+    points = models.IntegerField()
+    earned_at = models.DateTimeField()
+
+class SocialRecommendation(models.Model):
+    recommendation_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    content_id = models.IntegerField()
+    recommendation_type = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SocialTrendingTopic(models.Model):
+    trend_id = models.AutoField(primary_key=True)
+    category_id = models.IntegerField()
+    trend_name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class InfluencerCampaign(models.Model):
+    campaign_id = models.AutoField(primary_key=True)
+    influencer_id = models.IntegerField()
+    campaign_details = models.TextField()
+    stats = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class SocialCollaboration(models.Model):
+    collaboration_id = models.AutoField(primary_key=True)
+    partner_id = models.IntegerField()
+    user_id = models.IntegerField()
+    status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CMSIntegration(models.Model):
+    integration_id = models.AutoField(primary_key=True)
+    cms_id = models.IntegerField()
+    configuration = models.JSONField()
+    status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+EOF
+
+
+# Add the admin registration to admin.py
+cat <<EOF > SocialShare/admin.py
+from django.contrib import admin
+from .models import SocialShare, SocialAnalytics, SocialLike, SocialComment, SocialPrivacy, UserSocialProfile, SocialBadge, SocialReward, SocialRecommendation, SocialTrendingTopic, InfluencerCampaign, SocialCollaboration, CMSIntegration
+
+class SocialShareAdmin(admin.ModelAdmin):
+    list_display = ('share_id', 'user_id', 'platform', 'content_id', 'share_url', 'created_at', 'updated_at')
+    search_fields = ('user_id', 'platform', 'content_id')
+
+class SocialAnalyticsAdmin(admin.ModelAdmin):
+    list_display = ('analytics_id', 'share_id', 'views', 'engagement', 'conversions', 'created_at', 'updated_at')
+    search_fields = ('share_id',)
+
+class SocialLikeAdmin(admin.ModelAdmin):
+    list_display = ('like_id', 'user_id', 'post_id', 'action', 'created_at', 'updated_at')
+    search_fields = ('user_id', 'post_id', 'action')
+
+class SocialCommentAdmin(admin.ModelAdmin):
+    list_display = ('comment_id', 'user_id', 'post_id', 'comment_text', 'created_at', 'updated_at')
+    search_fields = ('user_id', 'post_id')
+
+class SocialPrivacyAdmin(admin.ModelAdmin):
+    list_display = ('post_id', 'user_id', 'privacy_level', 'created_at', 'updated_at')
+    search_fields = ('post_id', 'user_id', 'privacy_level')
+
+class UserSocialProfileAdmin(admin.ModelAdmin):
+    list_display = ('profile_id', 'user_id', 'platform', 'share_count', 'like_count', 'comment_count', 'created_at', 'updated_at')
+    search_fields = ('user_id', 'platform')
+
+class SocialBadgeAdmin(admin.ModelAdmin):
+    list_display = ('badge_id', 'user_id', 'badge_name', 'earned_at')
+    search_fields = ('user_id', 'badge_name')
+
+class SocialRewardAdmin(admin.ModelAdmin):
+    list_display = ('reward_id', 'user_id', 'reward_name', 'points', 'earned_at')
+    search_fields = ('user_id', 'reward_name')
+
+class SocialRecommendationAdmin(admin.ModelAdmin):
+    list_display = ('recommendation_id', 'user_id', 'content_id', 'recommendation_type', 'created_at', 'updated_at')
+    search_fields = ('user_id', 'content_id', 'recommendation_type')
+
+class SocialTrendingTopicAdmin(admin.ModelAdmin):
+    list_display = ('trend_id', 'category_id', 'trend_name', 'created_at', 'updated_at')
+    search_fields = ('category_id', 'trend_name')
+
+class InfluencerCampaignAdmin(admin.ModelAdmin):
+    list_display = ('campaign_id', 'influencer_id', 'campaign_details', 'created_at', 'updated_at')
+    search_fields = ('influencer_id',)
+
+class SocialCollaborationAdmin(admin.ModelAdmin):
+    list_display = ('collaboration_id', 'partner_id', 'user_id', 'status', 'created_at', 'updated_at')
+    search_fields = ('partner_id', 'user_id', 'status')
+
+class CMSIntegrationAdmin(admin.ModelAdmin):
+    list_display = ('integration_id', 'cms_id', 'configuration', 'status', 'created_at', 'updated_at')
+    search_fields = ('cms_id', 'status')
+
+admin.site.register(SocialShare, SocialShareAdmin)
+admin.site.register(SocialAnalytics, SocialAnalyticsAdmin)
+admin.site.register(SocialLike, SocialLikeAdmin)
+admin.site.register(SocialComment, SocialCommentAdmin)
+admin.site.register(SocialPrivacy, SocialPrivacyAdmin)
+admin.site.register(UserSocialProfile, UserSocialProfileAdmin)
+admin.site.register(SocialBadge, SocialBadgeAdmin)
+admin.site.register(SocialReward, SocialRewardAdmin)
+admin.site.register(SocialRecommendation, SocialRecommendationAdmin)
+admin.site.register(SocialTrendingTopic, SocialTrendingTopicAdmin)
+admin.site.register(InfluencerCampaign, InfluencerCampaignAdmin)
+admin.site.register(SocialCollaboration, SocialCollaborationAdmin)
+admin.site.register(CMSIntegration, CMSIntegrationAdmin)
+EOF
+
+# Display success message
+echo "SocialShare app created with models and registered in Django admin."
+
+
+
+
+
+
+
+
+
+
+
+
+
+#!/bin/bash
+
+# Create Django app
+python manage.py startapp LoyaltyProgram
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'LoyaltyProgram'," $SETTINGS_FILE
+
+
+# Add the models to models.py
+cat <<EOF > LoyaltyProgram/models.py
+from django.db import models
+
+class LoyaltyEnrollment(models.Model):
+    enrollment_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    enrollment_date = models.DateTimeField()
+    status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class LoyaltyPointsHistory(models.Model):
+    history_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    points = models.IntegerField()
+    activity_type = models.CharField(max_length=50)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class LoyaltyRedemptionHistory(models.Model):
+    redemption_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    points_redeemed = models.IntegerField()
+    redemption_date = models.DateTimeField()
+    item_redeemed = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class LoyaltyTier(models.Model):
+    tier_id = models.AutoField(primary_key=True)
+    tier_name = models.CharField(max_length=255)
+    tier_details = models.TextField()
+    tier_benefits = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class LoyaltyMembershipStatus(models.Model):
+    status_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    current_tier = models.ForeignKey(LoyaltyTier, on_delete=models.CASCADE)
+    status = models.CharField(max_length=50)
+    points_balance = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class LoyaltyEarningOpportunity(models.Model):
+    opportunity_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    activity_id = models.IntegerField()
+    activity_details = models.TextField()
+    points = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class LoyaltyCustomization(models.Model):
+    customization_id = models.AutoField(primary_key=True)
+    rules = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class LoyaltyPromotion(models.Model):
+    promotion_id = models.AutoField(primary_key=True)
+    promotion_details = models.TextField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class LoyaltyPointsTransfer(models.Model):
+    transfer_id = models.AutoField(primary_key=True)
+    from_customer_id = models.IntegerField()
+    to_customer_id = models.IntegerField()
+    points = models.IntegerField()
+    transfer_date = models.DateTimeField()
+    status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class LoyaltyAnalytics(models.Model):
+    analytics_id = models.AutoField(primary_key=True)
+    metric = models.CharField(max_length=50)
+    value = models.IntegerField()
+    period = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class LoyaltyReferral(models.Model):
+    referral_id = models.AutoField(primary_key=True)
+    referrer_id = models.IntegerField()
+    referred_id = models.IntegerField()
+    referral_date = models.DateTimeField()
+    points_awarded = models.IntegerField()
+    status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class LoyaltyNotification(models.Model):
+    notification_id = models.AutoField(primary_key=True)
+    customer_id = models.IntegerField()
+    notification_type = models.CharField(max_length=50)
+    status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+EOF
+
+
+# Add the admin registration to admin.py
+cat <<EOF > LoyaltyProgram/admin.py
+from django.contrib import admin
+from .models import LoyaltyEnrollment, LoyaltyPointsHistory, LoyaltyRedemptionHistory, LoyaltyTier, LoyaltyMembershipStatus, LoyaltyEarningOpportunity, LoyaltyCustomization, LoyaltyPromotion, LoyaltyPointsTransfer, LoyaltyAnalytics, LoyaltyReferral, LoyaltyNotification
+
+class LoyaltyEnrollmentAdmin(admin.ModelAdmin):
+    list_display = ('enrollment_id', 'customer_id', 'enrollment_date', 'status', 'created_at', 'updated_at')
+    search_fields = ('customer_id', 'status')
+
+class LoyaltyPointsHistoryAdmin(admin.ModelAdmin):
+    list_display = ('history_id', 'customer_id', 'points', 'activity_type', 'created_at', 'updated_at')
+    search_fields = ('customer_id', 'activity_type')
+
+class LoyaltyRedemptionHistoryAdmin(admin.ModelAdmin):
+    list_display = ('redemption_id', 'customer_id', 'points_redeemed', 'redemption_date', 'item_redeemed', 'created_at', 'updated_at')
+    search_fields = ('customer_id', 'item_redeemed')
+
+class LoyaltyTierAdmin(admin.ModelAdmin):
+    list_display = ('tier_id', 'tier_name', 'created_at', 'updated_at')
+    search_fields = ('tier_name',)
+
+class LoyaltyMembershipStatusAdmin(admin.ModelAdmin):
+    list_display = ('status_id', 'customer_id', 'current_tier', 'status', 'points_balance', 'created_at', 'updated_at')
+    search_fields = ('customer_id', 'status')
+
+class LoyaltyEarningOpportunityAdmin(admin.ModelAdmin):
+    list_display = ('opportunity_id', 'customer_id', 'activity_id', 'points', 'created_at', 'updated_at')
+    search_fields = ('customer_id', 'activity_id')
+
+class LoyaltyCustomizationAdmin(admin.ModelAdmin):
+    list_display = ('customization_id', 'created_at', 'updated_at')
+    search_fields = ('customization_id',)
+
+class LoyaltyPromotionAdmin(admin.ModelAdmin):
+    list_display = ('promotion_id', 'start_date', 'end_date', 'created_at', 'updated_at')
+    search_fields = ('promotion_id',)
+
+class LoyaltyPointsTransferAdmin(admin.ModelAdmin):
+    list_display = ('transfer_id', 'from_customer_id', 'to_customer_id', 'points', 'transfer_date', 'status', 'created_at', 'updated_at')
+    search_fields = ('from_customer_id', 'to_customer_id', 'status')
+
+class LoyaltyAnalyticsAdmin(admin.ModelAdmin):
+    list_display = ('analytics_id', 'metric', 'value', 'period', 'created_at', 'updated_at')
+    search_fields = ('metric', 'period')
+
+class LoyaltyReferralAdmin(admin.ModelAdmin):
+    list_display = ('referral_id', 'referrer_id', 'referred_id', 'referral_date', 'points_awarded', 'status', 'created_at', 'updated_at')
+    search_fields = ('referrer_id', 'referred_id', 'status')
+
+class LoyaltyNotificationAdmin(admin.ModelAdmin):
+    list_display = ('notification_id', 'customer_id', 'notification_type', 'status', 'created_at', 'updated_at')
+    search_fields = ('customer_id', 'notification_type', 'status')
+
+admin.site.register(LoyaltyEnrollment, LoyaltyEnrollmentAdmin)
+admin.site.register(LoyaltyPointsHistory, LoyaltyPointsHistoryAdmin)
+admin.site.register(LoyaltyRedemptionHistory, LoyaltyRedemptionHistoryAdmin)
+admin.site.register(LoyaltyTier, LoyaltyTierAdmin)
+admin.site.register(LoyaltyMembershipStatus, LoyaltyMembershipStatusAdmin)
+admin.site.register(LoyaltyEarningOpportunity, LoyaltyEarningOpportunityAdmin)
+admin.site.register(LoyaltyCustomization, LoyaltyCustomizationAdmin)
+admin.site.register(LoyaltyPromotion, LoyaltyPromotionAdmin)
+admin.site.register(LoyaltyPointsTransfer, LoyaltyPointsTransferAdmin)
+admin.site.register(LoyaltyAnalytics, LoyaltyAnalyticsAdmin)
+admin.site.register(LoyaltyReferral, LoyaltyReferralAdmin)
+admin.site.register(LoyaltyNotification, LoyaltyNotificationAdmin)
+EOF
+
+# Display success message
+echo "LoyaltyProgram app created with models and registered in Django admin."
+
+
+
+
 
 
 
