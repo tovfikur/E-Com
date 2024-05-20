@@ -279,6 +279,8 @@ EOF
 
 # Step 4: Create Django migrations
 python manage.py makemigrations ProductManagement
+
+
 ## Create Inventory Management ##
 
 # Step 1: Create Django app
@@ -4444,3 +4446,15 @@ fi
 print_header "All migrations applied successfully!"
 print_header "All tests passed successfully!"
 print_header "Setup is complete. Activate your virtual environment with 'source .env/bin/activate' and run the server with 'python manage.py runserver'."
+
+
+# Directory containing the scripts
+scripts_dir="./api_generation"  # Capture the directory path as an argument
+
+# Loop through all files ending in ".sh" (modify if needed)
+for script in "$scripts_dir"/*.sh; do
+  # Check if it's a regular file and has execute permission
+  if [[ -f "$script" && -x "$script" ]]; then
+    sh "$script"  # Execute the script
+  fi
+done
