@@ -3540,7 +3540,7 @@ admin.site.register(LoyaltyNotification, LoyaltyNotificationAdmin)
 EOF
 
 # Create Django migrations
-python manage.py makemigrations SocialShare
+python manage.py makemigrations LoyaltyProgram
 
 # Display success message
 echo "LoyaltyProgram app created with models and registered in Django admin."

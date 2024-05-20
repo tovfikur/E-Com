@@ -7,11 +7,12 @@ VIEWS_FILE="$API_DIR/views.py"
 URLS_FILE="$API_DIR/urls.py"
 SERIALIZERS_FILE="$API_DIR/serializers.py"
 SETTINGS_FILE="../$PROJECT_NAME/$PROJECT_NAME/settings.py"
-
+PROJECT_URLS_FILE="../$PROJECT_NAME/$PROJECT_NAME/urls.py"
+APP_URLS_FILE="../$PROJECT_NAME/$APP_NAME/urls.py"
 
 # Step 1: Create the api folder and files
 mkdir -p $API_DIR
-cat <<EOF > $API_DIR/__init__.py 
+cat <<EOF > $API_DIR/__init__.py
 
 EOF
 
@@ -141,9 +142,7 @@ urlpatterns = [
 ]
 EOF
 
-# Step 5: Include the api urls in the main urls.py of your project
-APP_URLS_FILE="../$PROJECT_NAME/$APP_NAME/urls.py"
-# Step 6: Ensure the main project urls.py file exists and include the api urls
+# Step 5: Ensure the main project urls.py file exists and include the api urls
 if [ ! -f "$APP_URLS_FILE" ]; then
     # Create the main urls.py if it does not exist
     cat <<EOF > $APP_URLS_FILE
@@ -160,14 +159,13 @@ else
     fi
 fi
 
-# Add the api path if it's not already included in the main urls.py
-! grep -q "path('$APP_NAME/', include('$APP_NAME.urls'))" && ! sed -i '/urlpatterns = \[/a \ \ \ \ path('$APP_NAME/', include('$APP_NAME.urls')),' "../$PROJECT_NAME/$PROJECT_NAME/urls.py"; then
-    sed -i "/urlpatterns = \[/a \ \ \ \ path('$APP_NAME/', include('$APP_NAME.urls')),"../$PROJECT_NAME/$PROJECT_NAME/urls.py
+# Step 6: Add the app path to the main project urls.py if not already included
+if ! grep -q "path('$APP_NAME/', include('$APP_NAME.urls'))" "$PROJECT_URLS_FILE"; then
+    sed -i "/urlpatterns = \[/a \ \ \ \ path('$APP_NAME/', include('$APP_NAME.urls'))," $PROJECT_URLS_FILE
 fi
-
-echo "../$PROJECT_NAME/$PROJECT_NAME/urls.py"
-echo "$PWD"
 
 # Step 7: Create Django migrations
 python ../$PROJECT_NAME/manage.py makemigrations $APP_NAME
 python ../$PROJECT_NAME/manage.py migrate
+
+echo "API setup completed successfully."
