@@ -352,3 +352,84 @@ fi
 
 
 
+
+# Test script for the Shipping and Fulfillment App setup
+
+print_header "Checking app creation - hipping and Fulfillment"
+
+# Step 1: Test Django app creation
+if [ -d "ShippingAndFulfillment" ]; then
+    echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
+else
+    echo -e "${RED}${CROSS_MARK} Django app creation: FAIL${NC}"
+    exit 1
+fi
+
+# Step 2: Test Django models creation
+MODELS=("ShippingAddresses" "ShippingLabels" "PackageTracking" "ShippingCarriers" "ShippingInsurance")
+for model in "${MODELS[@]}"; do
+    if grep -q "class $model(models.Model):" "ShippingAndFulfillment/models.py"; then
+        echo -e "${GREEN}${CHECK_MARK} Django model $model creation: PASS${NC}"
+    else
+        echo -e "${RED}${CROSS_MARK} Django model $model creation: FAIL${NC}"
+        exit 1
+    fi
+done
+
+# Step 3: Test Django admin registration
+if grep -q "@admin.register(ShippingAddresses)" "ShippingAndFulfillment/admin.py"; then
+    echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
+else
+    echo -e "${RED}${CROSS_MARK} Django admin registration: FAIL${NC}"
+    exit 1
+fi
+
+# Step 4: Test Django migrations
+if python manage.py makemigrations --dry-run ShippingAndFulfillment &> /dev/null; then
+    echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
+else
+    echo -e "${RED}${CROSS_MARK} Django migrations creation: FAIL${NC}"
+    exit 1
+fi
+
+
+
+
+# Test script for the Search and Filtering App setup
+
+print_header "Checking app creation - Search and Filtering"
+
+# Step 1: Test Django app creation
+if [ -d "SearchAndFiltering" ]; then
+    echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
+else
+    echo -e "${RED}${CROSS_MARK} Django app creation: FAIL${NC}"
+    exit 1
+fi
+
+# Step 2: Test Django models creation
+MODELS=("AdvancedSearchHistory" "AttributeValues" "SavedSearches" "SearchHistory" "SearchIndex" "SearchFiltersPersistence" "SearchResultsExportHistory" "SearchRelevanceRanking")
+for model in "${MODELS[@]}"; do
+    if grep -q "class $model(models.Model):" "SearchAndFiltering/models.py"; then
+        echo -e "${GREEN}${CHECK_MARK} Django model $model creation: PASS${NC}"
+    else
+        echo -e "${RED}${CROSS_MARK} Django model $model creation: FAIL${NC}"
+        exit 1
+    fi
+done
+
+# Step 3: Test Django admin registration
+if grep -q "@admin.register(AdvancedSearchHistory)" "SearchAndFiltering/admin.py"; then
+    echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
+else
+    echo -e "${RED}${CROSS_MARK} Django admin registration: FAIL${NC}"
+    exit 1
+fi
+
+# Step 4: Test Django migrations
+if python manage.py makemigrations --dry-run SearchAndFiltering &> /dev/null; then
+    echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
+else
+    echo -e "${RED}${CROSS_MARK} Django migrations creation: FAIL${NC}"
+    exit 1
+fi
