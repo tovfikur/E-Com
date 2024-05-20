@@ -25,10 +25,10 @@ function print_header() {
 
 
 # Step 1: Create a Python virtual environment
-python3 -m venv khukumoni_env
+python3 -m venv .env
 
 # Step 2: Activate the virtual environment
-source khukumoni_env/bin/activate
+source .env/bin/activate
 
 # Step 3: Install necessary packages
 pip install django djangorestframework djangorestframework-simplejwt django-cors-headers
@@ -119,30 +119,6 @@ sed -i "/urlpatterns = \[/a \ \ \ \ path('api-auth/', include('rest_framework.ur
 
 python manage.py migrate
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@localhost', 'admin')" | python manage.py shell
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Product Management App ##
 
 # Step 1: Create Django app
@@ -303,30 +279,6 @@ EOF
 
 # Step 4: Create Django migrations
 python manage.py makemigrations ProductManagement
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Create Inventory Management ##
 
 # Step 1: Create Django app
@@ -423,38 +375,6 @@ EOF
 
 # Step 4: Create Django migrations
 python manage.py makemigrations InventoryManagement
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Create Customer Management ##
 
 # Step 1: Create Django app
@@ -729,30 +649,6 @@ python manage.py makemigrations CustomerManagement
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Create Order Management ##
 
 # Step 1: Create Django app
@@ -908,30 +804,6 @@ admin.site.register(OrderBatch, OrderBatchAdmin)
 EOF
 # Step 4: Create Django migrations
 python manage.py makemigrations OrderManagement
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## Payment Processing App ##
 
@@ -1149,22 +1021,6 @@ EOF
 
 # Step 4: Create Django migrations
 python manage.py makemigrations PaymentProcessing
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Creating Shipping and fullfillment app ##
 
 # Step 1: Create Django app
@@ -1371,22 +1227,6 @@ python manage.py makemigrations ShippingAndFulfillment
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Creating Search and filtering app ##
 
 # Step 1: Create Django app
@@ -1511,14 +1351,6 @@ EOF
 
 # Step 4: Create Django migrations
 python manage.py makemigrations SearchAndFiltering
-
-
-
-
-
-
-
-
 
 
 
@@ -1700,14 +1532,6 @@ python manage.py makemigrations MarketingAndPromotions
 
 
 
-
-
-
-
-
-
-
-
 ## Creating Analytics and Reporting app ##
 
 # Step 1: Create Django app
@@ -1883,22 +1707,6 @@ EOF
 
 # Step 4: Create Django migrations
 python manage.py makemigrations AnalyticsAndReporting
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## Creating Wishlist Management ##
@@ -2118,14 +1926,6 @@ python manage.py makemigrations WishlistManagement
 
 
 
-
-
-
-
-
-
-
-
 ## Creating Review and Ratings app ##
 
 # Step 1: Create Django app
@@ -2310,22 +2110,6 @@ EOF
 
 # Step 4: Create Django migrations
 python manage.py makemigrations ReviewsAndRatings
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Creating Recommendation app ##
 
 # Step 1: Create Django app
@@ -2547,22 +2331,6 @@ EOF
 # Step 4: Create Django migrations
 python manage.py makemigrations Recommendations
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Creating Cart Management app ##
 
 # Step 1: Create Django app
@@ -2752,22 +2520,6 @@ EOF
 python manage.py makemigrations CartManagement
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Creating Subscription Management app ##
 
 # Step 1: Create Django app
@@ -2937,22 +2689,6 @@ echo "SubscriptionManagement app created with models and registered in Django ad
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Creating Gift Card Management app ##
 
 # Step 1: Create Django app
@@ -3069,14 +2805,6 @@ python manage.py makemigrations GiftCardManagement
 
 # Display success message
 echo "GiftCardManagement app created with models and registered in Django admin."
-
-
-
-
-
-
-
-
 
 
 
@@ -3227,22 +2955,6 @@ python manage.py makemigrations OrderTracking
 
 # Display success message
 echo "OrderTracking app created with models and registered in Django admin."
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Create Django app
@@ -3453,22 +3165,6 @@ echo "CustomerSupport app created with models and registered in Django admin."
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Create Django app
 python manage.py startapp SocialShare
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'SocialShare'," $SETTINGS_FILE
@@ -3661,22 +3357,6 @@ python manage.py makemigrations SocialShare
 
 # Display success message
 echo "SocialShare app created with models and registered in Django admin."
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Create Django app
 python manage.py startapp LoyaltyProgram
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'LoyaltyProgram'," $SETTINGS_FILE
@@ -3880,7 +3560,7 @@ cd ..
 print_header "Test Python virtual environment creation"
 
 # Step 1: Test Python virtual environment creation
-if [ -d "khukumoni_env" ]; then
+if [ -d ".env" ]; then
     echo -e "${GREEN}${CHECK_MARK} Virtual environment creation: PASS${NC}"
 else
     echo -e "${RED}${CROSS_MARK} Virtual environment creation: FAIL${NC}"
@@ -3890,8 +3570,8 @@ fi
 # Step 2: Test virtual environment activation
 # This can be tricky to test because the script changes the shell environment.
 # You can check if the virtual environment is activated by checking if pip points to the virtual environment.
-source khukumoni_env/bin/activate
-if [[ $(pip --version) == *"khukumoni_env"* ]]; then
+source .env/bin/activate
+if [[ $(pip --version) == *".env"* ]]; then
     echo -e "${GREEN}${CHECK_MARK} Virtual environment activation: PASS${NC}"
 else
     echo -e "${RED}${CROSS_MARK} Virtual environment activation: FAIL${NC}"
@@ -4763,4 +4443,4 @@ fi
 
 print_header "All migrations applied successfully!"
 print_header "All tests passed successfully!"
-print_header "Setup is complete. Activate your virtual environment with 'source khukumoni_env/bin/activate' and run the server with 'python manage.py runserver'."
+print_header "Setup is complete. Activate your virtual environment with 'source .env/bin/activate' and run the server with 'python manage.py runserver'."
