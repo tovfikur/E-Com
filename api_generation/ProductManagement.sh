@@ -160,6 +160,13 @@ else
     fi
 fi
 
+# Add the api path if it's not already included in the main urls.py
+! grep -q "path('$APP_NAME/', include('$APP_NAME.urls'))" && ! sed -i '/urlpatterns = \[/a \ \ \ \ path('$APP_NAME/', include('$APP_NAME.urls')),' "../$PROJECT_NAME/$PROJECT_NAME/urls.py"; then
+    sed -i "/urlpatterns = \[/a \ \ \ \ path('$APP_NAME/', include('$APP_NAME.urls')),"../$PROJECT_NAME/$PROJECT_NAME/urls.py
+fi
+
+echo "../$PROJECT_NAME/$PROJECT_NAME/urls.py"
+echo "$PWD"
 
 # Step 7: Create Django migrations
 python ../$PROJECT_NAME/manage.py makemigrations $APP_NAME
