@@ -1344,9 +1344,6 @@ python manage.py makemigrations SearchAndFiltering
 
 
 
-
-
-
 ## Creating Markeign and promotions app##
 
 # Step 1: Create Django app
@@ -1913,9 +1910,6 @@ python manage.py makemigrations WishlistManagement
 
 
 
-
-
-
 ## Creating Review and Ratings app ##
 
 # Step 1: Create Django app
@@ -2100,6 +2094,8 @@ EOF
 
 # Step 4: Create Django migrations
 python manage.py makemigrations ReviewsAndRatings
+
+
 ## Creating Recommendation app ##
 
 # Step 1: Create Django app
@@ -2510,6 +2506,7 @@ EOF
 python manage.py makemigrations CartManagement
 
 
+
 ## Creating Subscription Management app ##
 
 # Step 1: Create Django app
@@ -2672,10 +2669,6 @@ python manage.py makemigrations SubscriptionManagement
 
 # Display success message
 echo "SubscriptionManagement app created with models and registered in Django admin."
-
-
-
-
 
 
 
@@ -3153,8 +3146,6 @@ echo "CustomerSupport app created with models and registered in Django admin."
 
 
 
-
-
 # Create Django app
 python manage.py startapp SocialShare
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'SocialShare'," $SETTINGS_FILE
@@ -3347,6 +3338,8 @@ python manage.py makemigrations SocialShare
 
 # Display success message
 echo "SocialShare app created with models and registered in Django admin."
+
+
 # Create Django app
 python manage.py startapp LoyaltyProgram
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'LoyaltyProgram'," $SETTINGS_FILE
