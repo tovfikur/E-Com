@@ -12,15 +12,13 @@ APP_URLS_FILE="../$PROJECT_NAME/$APP_NAME/urls.py"
 
 # Step 1: Create the api folder and files
 mkdir -p $API_DIR
-cat <<EOF > $API_DIR/__init__.py
-
-EOF
+touch $API_DIR/__init__.py
 
 # Step 2: Create serializers.py
 cat <<EOF > $SERIALIZERS_FILE
 from rest_framework import serializers
 from ..models import (
-    Brand, Category, Product, Inventory, Variant, Image, Video, Pricing, Discount
+    Brand, Category, Product, Variant, Image, Video, Pricing, Discount
 )
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -36,11 +34,6 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = '__all__'
-
-class InventorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Inventory
         fields = '__all__'
 
 class VariantSerializer(serializers.ModelSerializer):
@@ -73,10 +66,10 @@ EOF
 cat <<EOF > $VIEWS_FILE
 from rest_framework import viewsets
 from ..models import (
-    Brand, Category, Product, Inventory, Variant, Image, Video, Pricing, Discount
+    Brand, Category, Product, Variant, Image, Video, Pricing, Discount
 )
 from .serializers import (
-    BrandSerializer, CategorySerializer, ProductSerializer, InventorySerializer,
+    BrandSerializer, CategorySerializer, ProductSerializer,
     VariantSerializer, ImageSerializer, VideoSerializer, PricingSerializer, DiscountSerializer
 )
 
@@ -91,10 +84,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
-class InventoryViewSet(viewsets.ModelViewSet):
-    queryset = Inventory.objects.all()
-    serializer_class = InventorySerializer
 
 class VariantViewSet(viewsets.ModelViewSet):
     queryset = Variant.objects.all()
@@ -122,7 +111,7 @@ cat <<EOF > $URLS_FILE
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
-    BrandViewSet, CategoryViewSet, ProductViewSet, InventoryViewSet,
+    BrandViewSet, CategoryViewSet, ProductViewSet,
     VariantViewSet, ImageViewSet, VideoViewSet, PricingViewSet, DiscountViewSet
 )
 
@@ -130,7 +119,6 @@ router = DefaultRouter()
 router.register(r'brands', BrandViewSet)
 router.register(r'categories', CategoryViewSet)
 router.register(r'products', ProductViewSet)
-router.register(r'inventories', InventoryViewSet)
 router.register(r'variants', VariantViewSet)
 router.register(r'images', ImageViewSet)
 router.register(r'videos', VideoViewSet)
@@ -164,8 +152,5 @@ if ! grep -q "path('$APP_NAME/', include('$APP_NAME.urls'))" "$PROJECT_URLS_FILE
     sed -i "/urlpatterns = \[/a \ \ \ \ path('$APP_NAME/', include('$APP_NAME.urls'))," $PROJECT_URLS_FILE
 fi
 
-# Step 7: Create Django migrations
-python ../$PROJECT_NAME/manage.py makemigrations $APP_NAME
-python ../$PROJECT_NAME/manage.py migrate
+echo "API setup for ProductManagement completed successfully."
 
-echo "API setup completed successfully."

@@ -119,6 +119,8 @@ sed -i "/urlpatterns = \[/a \ \ \ \ path('api-auth/', include('rest_framework.ur
 
 python manage.py migrate
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@localhost', 'admin')" | python manage.py shell
+
+
 ## Product Management App ##
 
 # Step 1: Create Django app
@@ -163,17 +165,6 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-class Inventory(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-    adjusted_by = models.CharField(max_length=255)
-    adjustment_reason = models.TextField()
-    adjustment_time = models.DateTimeField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f'{self.product.name} - {self.quantity}'
 
 class Variant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -224,7 +215,7 @@ EOF
 cat <<EOF > ProductManagement/admin.py
 from django.contrib import admin
 from .models import (
-    Brand, Category, Product, Inventory, Variant, Image, Video, Pricing, Discount
+    Brand, Category, Product, Variant, Image, Video, Pricing, Discount
 )
 
 class BrandAdmin(admin.ModelAdmin):
@@ -239,11 +230,6 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'price', 'brand', 'category', 'status', 'created_at', 'updated_at')
     search_fields = ('name', 'description')
     list_filter = ('brand', 'category', 'status')
-
-class InventoryAdmin(admin.ModelAdmin):
-    list_display = ('product', 'quantity', 'adjusted_by', 'adjustment_reason', 'adjustment_time', 'created_at', 'updated_at')
-    search_fields = ('product__name', 'adjusted_by')
-    list_filter = ('adjusted_by',)
 
 class VariantAdmin(admin.ModelAdmin):
     list_display = ('product', 'name', 'price', 'sku', 'created_at', 'updated_at')
@@ -268,7 +254,6 @@ class DiscountAdmin(admin.ModelAdmin):
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
-admin.site.register(Inventory, InventoryAdmin)
 admin.site.register(Variant, VariantAdmin)
 admin.site.register(Image, ImageAdmin)
 admin.site.register(Video, VideoAdmin)
@@ -377,6 +362,8 @@ EOF
 
 # Step 4: Create Django migrations
 python manage.py makemigrations InventoryManagement
+
+
 ## Create Customer Management ##
 
 # Step 1: Create Django app
@@ -3687,7 +3674,7 @@ else
 fi
 
 # Step 2: Test Django models creation
-MODELS=("Brand" "Category" "Product" "Inventory" "Variant" "Image" "Video" "Pricing" "Discount")
+MODELS=("Brand" "Category" "Product" "Variant" "Image" "Video" "Pricing" "Discount")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "ProductManagement/models.py"; then
         echo -e "${GREEN}${CHECK_MARK} Django model $model creation: PASS${NC}"
@@ -4449,12 +4436,28 @@ print_header "Setup is complete. Activate your virtual environment with 'source 
 
 
 # Directory containing the scripts
-scripts_dir="./api_generation"  # Capture the directory path as an argument
+scripts_dir="../apis"
+echo "$PWD"
+# Check if the directory exists
+if [[ ! -d "$scripts_dir" ]]; then
+  echo "Directory $scripts_dir does not exist."
+  exit 1
+fi
 
-# Loop through all files ending in ".sh" (modify if needed)
+
+# Loop through all files ending in ".sh"
 for script in "$scripts_dir"/*.sh; do
+  # Check if the script file exists and is not an empty list (no .sh files case)
+  if [[ ! -e "$script" ]]; then
+    echo "No .sh scripts found in $scripts_dir."
+    break
+  fi
+
   # Check if it's a regular file and has execute permission
   if [[ -f "$script" && -x "$script" ]]; then
-    sh "$script"  # Execute the script
+    echo "Executing $script..."
+    "$script"  # Execute the script
+  else
+    echo "Skipping $script: Not a regular file or lacks execute permission."
   fi
 done
