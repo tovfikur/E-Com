@@ -794,8 +794,8 @@ EOF
 # Step 4: Create Django migrations
 python manage.py makemigrations OrderManagement
 
-## Payment Processing App ##
 
+## Payment Processing App ##
 
 # Step 1: Create Django app
 python manage.py startapp PaymentProcessing
@@ -1010,6 +1010,8 @@ EOF
 
 # Step 4: Create Django migrations
 python manage.py makemigrations PaymentProcessing
+
+
 ## Creating Shipping and fullfillment app ##
 
 # Step 1: Create Django app
@@ -1212,7 +1214,6 @@ EOF
 
 # Step 4: Create Django migrations
 python manage.py makemigrations ShippingAndFulfillment
-
 
 
 
