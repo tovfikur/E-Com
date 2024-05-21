@@ -56,7 +56,7 @@ class SubscriptionUsageTrackingSerializer(serializers.ModelSerializer):
 class SubscriptionAnalyticsSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubscriptionAnalytics
-        fields = '__all__
+        fields = '__all__'
 
 class SubscriptionDiscountsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -116,6 +116,11 @@ class SubscriptionDiscountsViewSet(viewsets.ModelViewSet):
 class SubscriptionCustomizationOptionsViewSet(viewsets.ModelViewSet):
     queryset = SubscriptionCustomizationOptions.objects.all()
     serializer_class = SubscriptionCustomizationOptionsSerializer
+
+class SubscriptionUsageTrackingViewSet(viewsets.ModelViewSet):
+    queryset = SubscriptionUsageTracking.objects.all()
+    serializer_class = SubscriptionUsageTrackingSerializer
+
 EOF
 
 # Step 4: Create urls.py

@@ -16,7 +16,7 @@ touch $API_DIR/__init__.py
 # Step 2: Create serializers.py
 cat <<EOF > $SERIALIZERS_FILE
 from rest_framework import serializers
-from .models import (
+from ..models import (
     PromotionRules, PromotionCoupons, PromotionSegments, PromotionAnalytics,
     PromotionTargeting, PromotionABTesting, PromotionContent,
     PromotionPersonalization, PromotionCollaborationHistory,
@@ -82,7 +82,7 @@ EOF
 # Step 3: Create views.py
 cat <<EOF > $VIEWS_FILE
 from rest_framework import viewsets
-from .models import (
+from ..models import (
     PromotionRules, PromotionCoupons, PromotionSegments, PromotionAnalytics,
     PromotionTargeting, PromotionABTesting, PromotionContent,
     PromotionPersonalization, PromotionCollaborationHistory,

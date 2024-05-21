@@ -18,7 +18,7 @@ touch $API_DIR/__init__.py
 cat <<EOF > $SERIALIZERS_FILE
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import (
+from ..models import (
     AdvancedSearchHistory, AttributeValues, SavedSearches, SearchHistory,
     SearchIndex, SearchFiltersPersistence, SearchResultsExportHistory,
     SearchRelevanceRanking
@@ -68,7 +68,7 @@ EOF
 # Step 3: Create views.py
 cat <<EOF > $VIEWS_FILE
 from rest_framework import viewsets
-from .models import (
+from ..models import (
     AdvancedSearchHistory, AttributeValues, SavedSearches, SearchHistory,
     SearchIndex, SearchFiltersPersistence, SearchResultsExportHistory,
     SearchRelevanceRanking

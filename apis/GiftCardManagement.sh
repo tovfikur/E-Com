@@ -1,7 +1,7 @@
 #!/bin/bash
 
 APP_NAME="GiftCardManagement"
-PROJECT_NAME="YourProjectName"
+PROJECT_NAME="Khukumoni"
 API_DIR="../$PROJECT_NAME/$APP_NAME/api"
 VIEWS_FILE="$API_DIR/views.py"
 URLS_FILE="$API_DIR/urls.py"
@@ -56,7 +56,11 @@ cat <<EOF > $VIEWS_FILE
 from rest_framework import viewsets
 from ..models import GiftCards, GiftCardTransactions, GiftCardNotifications, POSIntegrationConfiguration, \
     GiftCardRedemptionOptions, GiftCardCustomizationOptions
-from .serializers import GiftCardsSerializer
+from .serializers import (
+    GiftCardsSerializer, GiftCardTransactionsSerializer,
+    GiftCardNotificationsSerializer, POSIntegrationConfigurationSerializer,
+    GiftCardRedemptionOptionsSerializer, GiftCardCustomizationOptionsSerializer
+)
 
 class GiftCardsViewSet(viewsets.ModelViewSet):
     queryset = GiftCards.objects.all()

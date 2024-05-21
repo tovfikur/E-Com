@@ -73,7 +73,7 @@ class SocialTrendingTopicSerializer(serializers.ModelSerializer):
 
 class InfluencerCampaignSerializer(serializers.ModelSerializer):
     class Meta:
-        model = influencerCampaign
+        model = InfluencerCampaign
         fields = '__all__'
 
 class SocialCollaborationSerializer(serializers.ModelSerializer):
@@ -96,7 +96,7 @@ SocialBadge, SocialReward, SocialRecommendation, SocialTrendingTopic, Influencer
 from .serializers import (
     SocialShareSerializer, SocialAnalyticsSerializer, SocialLikeSerializer, SocialCommentSerializer, SocialPrivacySerializer, 
     UserSocialProfileSerializer, SocialBadgeSerializer, SocialRewardSerializer, SocialRecommendationSerializer, 
-    SocialTrendingTopicSerializer, influencerCampaignSerializer, SocialCollaborationSerializer, CMSIntegrationSerializer
+    SocialTrendingTopicSerializer, InfluencerCampaignSerializer, SocialCollaborationSerializer, CMSIntegrationSerializer
 )
 
 class SocialShareViewSet(viewsets.ModelViewSet):
@@ -140,8 +140,8 @@ class SocialTrendingTopicViewSet(viewsets.ModelViewSet):
     serializer_class = SocialTrendingTopicSerializer
 
 class InfluencerCampaignViewSet(viewsets.ModelViewSet):
-    queryset = influencerCampaign.objects.all()
-    serializer_class = influencerCampaignSerializer
+    queryset = InfluencerCampaign.objects.all()
+    serializer_class = InfluencerCampaignSerializer
 
 class SocialCollaborationViewSet(viewsets.ModelViewSet):
     queryset = SocialCollaboration.objects.all()
@@ -160,7 +160,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     SocialShareViewSet, SocialAnalyticsViewSet, SocialLikeViewSet, SocialCommentViewSet, SocialPrivacyViewSet,
     UserSocialProfileViewSet, SocialBadgeViewSet, SocialRewardViewSet, SocialRecommendationViewSet,
-    SocialTrendingTopicViewSet, influencerCampaignViewSet, SocialCollaborationViewSet, CMSIntegrationViewSet
+    SocialTrendingTopicViewSet, InfluencerCampaignViewSet, SocialCollaborationViewSet, CMSIntegrationViewSet
 )
 
 router = DefaultRouter()
@@ -176,7 +176,7 @@ router.register(r'social-badge', SocialBadgeViewSet)
 router.register(r'social-reward', SocialRewardViewSet)
 router.register(r'social-recommendation', SocialRecommendationViewSet)
 router.register(r'social-trending-topic', SocialTrendingTopicViewSet)
-router.register(r'influencer-campaign', influencerCampaignViewSet)
+router.register(r'influencer-campaign', InfluencerCampaignViewSet)
 router.register(r'social-collaboration', SocialCollaborationViewSet)
 router.register(r'cms-integration', CMSIntegrationViewSet)
 
