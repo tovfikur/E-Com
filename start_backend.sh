@@ -23,7 +23,6 @@ function print_header() {
   tput sgr0;
 }
 
-
 # Step 1: Create a Python virtual environment
 python3 -m venv .env
 
@@ -4429,29 +4428,78 @@ print_header "All tests passed successfully!"
 print_header "Setup is complete. Activate your virtual environment with 'source .env/bin/activate' and run the server with 'python manage.py runserver'."
 
 
-# Directory containing the scripts
+
+
+
+# Ensure curl is available
+if ! command -v curl &> /dev/null; then
+  echo "curl command not found. Installing curl..."
+  # Update package list and install curl based on the OS
+  if [[ "$(uname -s)" == "Linux" ]]; then
+    if [[ -f /etc/debian_version ]]; then
+      sudo apt update && sudo apt install -y curl
+    elif [[ -f /etc/redhat-release ]]; then
+      sudo yum install -y curl
+    else
+      echo "Unsupported Linux distribution. Please install curl manually."
+      exit 1
+    fi
+  elif [[ "$(uname -s)" == "Darwin" ]]; then
+    if ! command -v brew &> /dev/null; then
+      echo "Homebrew not found. Please install Homebrew first: https://brew.sh/"
+      exit 1
+    else
+      brew install curl
+    fi
+  else
+    echo "Unsupported OS. Please install curl manually."
+    exit 1
+  fi
+fi
+
+# Directory to save downloaded scripts
 scripts_dir="../apis"
 echo "$PWD"
-# Check if the directory exists
+
+# GitHub repository URL
+repo_url="https://github.com/tovfikur/E-Com/tree/main/apis"
+raw_base_url="https://raw.githubusercontent.com/tovfikur/E-Com/main/apis"
+
+# Check if the directory exists, if not, create it
 if [[ ! -d "$scripts_dir" ]]; then
-  echo "Directory $scripts_dir does not exist."
+  echo "Directory $scripts_dir does not exist. Creating it."
+  mkdir -p "$scripts_dir"
+fi
+
+# Fetch the list of .sh files from the GitHub repository
+html_content=$(curl -s "$repo_url")
+
+# Extract the script file names from the HTML content
+script_files=$(echo "$html_content" | grep -oP '(?<=href=")/tovfikur/E-Com/blob/main/apis/[^"]+\.sh' | sed 's|/tovfikur/E-Com/blob/main/apis/||')
+
+# Check if any scripts were found
+if [[ -z "$script_files" ]]; then
+  echo "No .sh scripts found in $repo_url."
   exit 1
 fi
 
+# Loop through each script file
+for script_file in $script_files; do
+  # Construct the full URL for the script
+  file_url="$raw_base_url/$script_file"
 
-# Loop through all files ending in ".sh"
-for script in "$scripts_dir"/*.sh; do
-  # Check if the script file exists and is not an empty list (no .sh files case)
-  if [[ ! -e "$script" ]]; then
-    echo "No .sh scripts found in $scripts_dir."
-    break
-  fi
+  # Download the script
+  curl -s -o "$scripts_dir/$script_file" "$file_url"
 
-  # Check if it's a regular file and has execute permission
-  if [[ -f "$script" && -x "$script" ]]; then
-    echo "Executing $script..."
-    "$script"  # Execute the script
+  # Check if the download was successful
+  if [[ -f "$scripts_dir/$script_file" ]]; then
+    # Give execute permissions to the script
+    chmod +x "$scripts_dir/$script_file"
+
+    # Execute the script
+    echo "Executing $script_file..."
+    "$scripts_dir/$script_file"
   else
-    echo "Skipping $script: Not a regular file or lacks execute permission."
+    echo "Failed to download $script_file."
   fi
 done
