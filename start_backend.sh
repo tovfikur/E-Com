@@ -3612,9 +3612,6 @@ else
     exit 1
 fi
 
-# Step 6: Test URL patterns update
-URLS_FILE="Khukumoni/urls.py"
-
 # Check if static and media URL patterns are added
 if grep -q "urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)" "$URLS_FILE" &&
    grep -q "urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)" "$URLS_FILE"; then
