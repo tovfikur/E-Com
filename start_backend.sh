@@ -120,6 +120,15 @@ python manage.py migrate
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@localhost', 'admin')" | python manage.py shell
 
 
+
+## Frontend App ##
+
+# Step 1: Create Django app
+python manage.py startapp frontend
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'frontend'," $SETTINGS_FILE
+
+
+
 ## Product Management App ##
 
 # Step 1: Create Django app
