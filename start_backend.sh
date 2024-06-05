@@ -123,9 +123,9 @@ echo "from django.contrib.auth.models import User; User.objects.create_superuser
 
 ## Frontend App ##
 
-# # Step 1: Create Django app
-# python manage.py startapp frontend
-# sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'frontend'," $SETTINGS_FILE
+# Step 1: Create Django app
+python manage.py startapp frontend
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'frontend'," $SETTINGS_FILE
 
 
 
@@ -4463,25 +4463,22 @@ if ! command -v curl &> /dev/null; then
   fi
 fi
 
-# Directory to save downloaded scripts
-scripts_dir="../apis"
-echo "$PWD"
+
+
 
 # GitHub repository URL
-repo_url="https://github.com/tovfikur/E-Com/tree/main/apis"
+repo_url="https://api.github.com/repos/tovfikur/E-Com/contents/apis"
 raw_base_url="https://raw.githubusercontent.com/tovfikur/E-Com/main/apis"
 
-# Check if the directory exists, if not, create it
-if [[ ! -d "$scripts_dir" ]]; then
-  echo "Directory $scripts_dir does not exist. Creating it."
-  mkdir -p "$scripts_dir"
+# Fetch the list of files from the GitHub repository using the API
+json_content=$(curl -s "$repo_url")
+if [[ -z "$json_content" ]]; then
+  echo "Failed to fetch JSON content from $repo_url."
+  exit 1
 fi
 
-# Fetch the list of .sh files from the GitHub repository
-html_content=$(curl -s "$repo_url")
-
-# Extract the script file names from the HTML content
-script_files=$(echo "$html_content" | grep -oP '(?<=href=")/tovfikur/E-Com/blob/main/apis/[^"]+\.sh' | sed 's|/tovfikur/E-Com/blob/main/apis/||')
+# Extract the script file names from the JSON content
+script_files=$(echo "$json_content" | jq -r '.[] | select(.name | endswith(".sh")) | .name')
 
 # Check if any scripts were found
 if [[ -z "$script_files" ]]; then
@@ -4489,23 +4486,12 @@ if [[ -z "$script_files" ]]; then
   exit 1
 fi
 
-# Loop through each script file
+# Loop through each script file and execute it directly from GitHub
 for script_file in $script_files; do
   # Construct the full URL for the script
   file_url="$raw_base_url/$script_file"
 
-  # Download the script
-  curl -s -o "$scripts_dir/$script_file" "$file_url"
-
-  # Check if the download was successful
-  if [[ -f "$scripts_dir/$script_file" ]]; then
-    # Give execute permissions to the script
-    chmod +x "$scripts_dir/$script_file"
-
-    # Execute the script
-    echo "Executing $script_file..."
-    "$scripts_dir/$script_file"
-  else
-    echo "Failed to download $script_file."
-  fi
+  # Execute the script directly from GitHub
+  echo "Executing $script_file from $file_url..."
+  curl -s "$file_url" | bash
 done
