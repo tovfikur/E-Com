@@ -7,7 +7,6 @@
 # URLS_FILE="../$PROJECT_NAME/$APP_NAME/urls.py"
 # SETTINGS_FILE="../$PROJECT_NAME/$PROJECT_NAME/settings.py"
 # PROJECT_URLS_FILE="../$PROJECT_NAME/$PROJECT_NAME/urls.py"
-# APP_URL = "../$PROJECT_NAME/$APP_NAME/"
 
 
 
@@ -28,18 +27,6 @@
 
 # EOF
 
-
-# mkdir -p $APP_URL/templates/
-# mkdir -p $APP_URL/static/
-# mkdir -p $APP_URL/static/css/
-# mkdir -p $APP_URL/static/frontend/
-# mkdir -p $APP_URL/static/images/
-# mkdir -p $APP_URL/src
-# mkdir -p $APP_URL/src/components
-
-
-# cd ../$PROJECT_NAME/$APP_NAME/
-# npm init -y
 
 # # Step 6: Add the app path to the main project urls.py if not already included
 # if ! grep -q "path('', include('$APP_NAME.urls'))" "$PROJECT_URLS_FILE"; then
