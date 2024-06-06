@@ -5,5 +5,5 @@
 
 cd ..
 
-npx create-next-app KhukumoniFrontEnd --example https://nextjs.org/learn/basics/getting-started
+npx create-next-app khukumoni --example https://nextjs.org/learn/basics/getting-started
 npm install axios

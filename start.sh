@@ -23,22 +23,22 @@ function print_header() {
   tput sgr0;
 }
 
-# Step 1: Create a Python virtual environment
+# Create a Python virtual environment
 python3 -m venv .env
 
-# Step 2: Activate the virtual environment
+# Activate the virtual environment
 source .env/bin/activate
 
-# Step 3: Install necessary packages
+# Install necessary packages
 pip install django djangorestframework djangorestframework-simplejwt django-cors-headers
 
-# Step 4: Create a Django project named Khukumoni
+# Create a Django project named Khukumoni
 django-admin startproject Khukumoni
 
 # Navigate to the project directory
 cd Khukumoni
 
-# Step 5: Update Django project settings
+# Update Django project settings
 SETTINGS_FILE="Khukumoni/settings.py"
 
 
@@ -77,7 +77,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Add middleware for CORS
 sed -i "/MIDDLEWARE = \[/a\ \ \ \ 'corsheaders.middleware.CorsMiddleware'," $SETTINGS_FILE
 
-# Step 6: Update URL patterns for static and media files
+# Update URL patterns for static and media files
 URLS_FILE="Khukumoni/urls.py"
 
 
@@ -123,12 +123,12 @@ echo "from django.contrib.auth.models import User; User.objects.create_superuser
 
 ## Product Management App ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp ProductManagement
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'ProductManagement'," $SETTINGS_FILE
 
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # Product model
 cat <<EOF > ProductManagement/models.py
@@ -211,7 +211,7 @@ class Discount(models.Model):
         return f'{self.product.name} - {self.discount_percentage}%'
 EOF
 
-# Step 3: Create Django admin registration for ProductManagement models
+# Create Django admin registration for ProductManagement models
 cat <<EOF > ProductManagement/admin.py
 from django.contrib import admin
 from .models import (
@@ -262,16 +262,16 @@ admin.site.register(Discount, DiscountAdmin)
 EOF
 
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations ProductManagement
 
 
 ## Create Inventory Management ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp InventoryManagement
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'InventoryManagement'," $SETTINGS_FILE
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # Inventory model
 cat <<EOF > InventoryManagement/models.py
@@ -341,7 +341,7 @@ class InventoryAdjustmentReason(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 EOF
 
-# Step 3: Create Django admin registration for InventoryManagement models
+# Create Django admin registration for InventoryManagement models
 cat <<EOF > InventoryManagement/admin.py
 from django.contrib import admin
 from .models import (
@@ -360,17 +360,17 @@ admin.site.register(InventoryReport)
 admin.site.register(InventoryAdjustmentReason)
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations InventoryManagement
 
 
 ## Create Customer Management ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp CustomerManagement
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'CustomerManagement'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # Customers model
 cat <<EOF > CustomerManagement/models.py
@@ -540,7 +540,7 @@ class Document(models.Model):
         return self.document_name
 EOF
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 cat <<EOF > CustomerManagement/admin.py
 from django.contrib import admin
 from .models import (
@@ -632,7 +632,7 @@ admin.site.register(CalendarEvent, CalendarEventAdmin)
 admin.site.register(Document, DocumentAdmin)
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations CustomerManagement
 
 
@@ -640,11 +640,11 @@ python manage.py makemigrations CustomerManagement
 
 ## Create Order Management ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp OrderManagement
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'OrderManagement'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 
 # Orders model
@@ -734,7 +734,7 @@ class OrderBatch(models.Model):
         return f'Order Batch {self.id} - {self.batch_type}'
 EOF
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 cat <<EOF > OrderManagement/admin.py
 from django.contrib import admin
 from .models import (
@@ -791,17 +791,17 @@ admin.site.register(OrderCommunication, OrderCommunicationAdmin)
 admin.site.register(RecurringOrder, RecurringOrderAdmin)
 admin.site.register(OrderBatch, OrderBatchAdmin)
 EOF
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations OrderManagement
 
 
 ## Payment Processing App ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp PaymentProcessing
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'PaymentProcessing'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # Payments model
 cat <<EOF > PaymentProcessing/models.py
@@ -935,7 +935,7 @@ class SecureAuthentication(models.Model):
 
 EOF
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 cat <<EOF > PaymentProcessing/admin.py
 from django.contrib import admin
 from .models import (
@@ -1008,17 +1008,17 @@ admin.site.register(FraudDetection, FraudDetectionAdmin)
 admin.site.register(SecureAuthentication, SecureAuthenticationAdmin)
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations PaymentProcessing
 
 
 ## Creating Shipping and fullfillment app ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp ShippingAndFulfillment
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'ShippingAndFulfillment'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # Shipping Addresses model
 cat <<EOF > ShippingAndFulfillment/models.py
@@ -1134,7 +1134,7 @@ class OrderRestriction(models.Model):
 EOF
 
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 cat <<EOF > ShippingAndFulfillment/admin.py
 from django.contrib import admin
 from .models import (
@@ -1212,18 +1212,18 @@ class OrderRestrictionAdmin(admin.ModelAdmin):
 
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations ShippingAndFulfillment
 
 
 
 ## Creating Search and filtering app ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp SearchAndFiltering
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'SearchAndFiltering'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # Advanced Search History model
 cat <<EOF > SearchAndFiltering/models.py
@@ -1288,7 +1288,7 @@ class SearchRelevanceRanking(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 EOF
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 cat <<EOF > SearchAndFiltering/admin.py
 from django.contrib import admin
 from .models import (
@@ -1339,18 +1339,18 @@ class SearchRelevanceRankingAdmin(admin.ModelAdmin):
 
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations SearchAndFiltering
 
 
 
 ## Creating Markeign and promotions app##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp MarketingAndPromotions
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'MarketingAndPromotions'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # Promotion Rules model
 cat <<EOF > MarketingAndPromotions/models.py
@@ -1447,7 +1447,7 @@ class PromotionIntegrations(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 EOF
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 cat <<EOF > MarketingAndPromotions/admin.py
 from django.contrib import admin
 from .models import (
@@ -1514,18 +1514,18 @@ class PromotionIntegrationsAdmin(admin.ModelAdmin):
 
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations MarketingAndPromotions
 
 
 
 ## Creating Analytics and Reporting app ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp AnalyticsAndReporting
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'AnalyticsAndReporting'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # Revenue Analytics model
 cat <<EOF > AnalyticsAndReporting/models.py
@@ -1619,7 +1619,7 @@ class CustomReporting(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 EOF
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 cat <<EOF > AnalyticsAndReporting/admin.py
 from django.contrib import admin
 from .models import (
@@ -1692,19 +1692,19 @@ class CustomReportingAdmin(admin.ModelAdmin):
 
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations AnalyticsAndReporting
 
 
 ## Creating Wishlist Management ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp WishlistManagement
 
 # Add the new app to INSTALLED_APPS in settings.py
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'WishlistManagement'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # Wishlist models
 cat <<EOF > WishlistManagement/models.py
@@ -1817,7 +1817,7 @@ class WishlistBackupRestore(models.Model):
     completed_at = models.DateTimeField(null=True, blank=True)
 EOF
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 cat <<EOF > WishlistManagement/admin.py
 from django.contrib import admin
 from .models import (
@@ -1905,20 +1905,20 @@ admin.site.register(WishlistSync, WishlistSyncAdmin)
 admin.site.register(WishlistBackupRestore, WishlistBackupRestoreAdmin)
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations WishlistManagement
 
 
 
 ## Creating Review and Ratings app ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp ReviewsAndRatings
 
 # Add the new app to INSTALLED_APPS in settings.py
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'ReviewsAndRatings'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # Reviews and Ratings models
 cat <<EOF > ReviewsAndRatings/models.py
@@ -2019,7 +2019,7 @@ class ReviewAuthentication(models.Model):
     verified_at = models.DateTimeField(null=True, blank=True)
 EOF
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 cat <<EOF > ReviewsAndRatings/admin.py
 from django.contrib import admin
 from .models import (
@@ -2092,19 +2092,19 @@ admin.site.register(ReviewGamification, ReviewGamificationAdmin)
 admin.site.register(ReviewAuthentication, ReviewAuthenticationAdmin)
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations ReviewsAndRatings
 
 
 ## Creating Recommendation app ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp Recommendations
 
 # Add the new app to INSTALLED_APPS in settings.py
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'Recommendations'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # Recommendations models
 cat <<EOF > Recommendations/models.py
@@ -2224,7 +2224,7 @@ class CustomerSpecificRecommendation(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 EOF
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 cat <<EOF > Recommendations/admin.py
 from django.contrib import admin
 from .models import (
@@ -2314,18 +2314,18 @@ admin.site.register(RecommendationPerformanceAnalytics, RecommendationPerformanc
 admin.site.register(CustomerSpecificRecommendation, CustomerSpecificRecommendationAdmin)
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations Recommendations
 
 ## Creating Cart Management app ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp CartManagement
 
 # Add the new app to INSTALLED_APPS in settings.py
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'CartManagement'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # Cart Management models
 cat <<EOF > CartManagement/models.py
@@ -2436,7 +2436,7 @@ class CartItemSubscription(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 EOF
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 cat <<EOF > CartManagement/admin.py
 from django.contrib import admin
 from .models import Cart, CartItems, CartItemDetails, CartDiscounts, CartPromotions, \
@@ -2502,18 +2502,18 @@ class CartItemSubscriptionAdmin(admin.ModelAdmin):
 
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations CartManagement
 
 
 
 ## Creating Subscription Management app ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp SubscriptionManagement
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'SubscriptionManagement'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # subscription management tables 
 cat <<EOF > SubscriptionManagement/models.py
@@ -2598,7 +2598,7 @@ class SubscriptionCustomizationOptions(models.Model):
 EOF
 
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 
 cat <<EOF > SubscriptionManagement/admin.py
 from django.contrib import admin
@@ -2664,7 +2664,7 @@ class SubscriptionCustomizationOptionsAdmin(admin.ModelAdmin):
     list_filter = ('created_at', 'updated_at')
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations SubscriptionManagement
 
 # Display success message
@@ -2674,11 +2674,11 @@ echo "SubscriptionManagement app created with models and registered in Django ad
 
 ## Creating Gift Card Management app ##
 
-# Step 1: Create Django app
+# Create Django app
 python manage.py startapp GiftCardManagement
 sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'GiftCardManagement'," $SETTINGS_FILE
 
-# Step 2: Create Django models for each table
+# Create Django models for each table
 
 # gift card management tables. 
 cat <<EOF > GiftCardManagement/models.py
@@ -2737,7 +2737,7 @@ class GiftCardCustomizationOptions(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 EOF
 
-# Step 3: Register models with Django admin
+# Register models with Django admin
 cat <<EOF > GiftCardManagement/admin.py
 from django.contrib import admin
 from .models import (
@@ -2783,7 +2783,7 @@ class GiftCardCustomizationOptionsAdmin(admin.ModelAdmin):
     list_filter = ('created_at', 'updated_at')
 EOF
 
-# Step 4: Create Django migrations
+# Create Django migrations
 python manage.py makemigrations GiftCardManagement
 
 # Display success message
@@ -3527,7 +3527,7 @@ python manage.py makemigrations LoyaltyProgram
 echo "LoyaltyProgram app created with models and registered in Django admin."
 
 
-# Step 4: Apply migrations
+# Apply migrations
 python manage.py migrate
 
 
@@ -3542,7 +3542,7 @@ cd ..
 # Test script for the Django setup script
 print_header "Test Python virtual environment creation"
 
-# Step 1: Test Python virtual environment creation
+# Test Python virtual environment creation
 if [ -d ".env" ]; then
     echo -e "${GREEN}${CHECK_MARK} Virtual environment creation: PASS${NC}"
 else
@@ -3550,7 +3550,7 @@ else
     exit 1
 fi
 
-# Step 2: Test virtual environment activation
+# Test virtual environment activation
 # This can be tricky to test because the script changes the shell environment.
 # You can check if the virtual environment is activated by checking if pip points to the virtual environment.
 source .env/bin/activate
@@ -3561,7 +3561,7 @@ else
     exit 1
 fi
 
-# Step 3: Test package installation
+# Test package installation
 REQUIRED_PACKAGES=("django" "djangorestframework" "djangorestframework-simplejwt" "django-cors-headers")
 for package in "${REQUIRED_PACKAGES[@]}"; do
     if pip show $package &> /dev/null; then
@@ -3572,7 +3572,7 @@ for package in "${REQUIRED_PACKAGES[@]}"; do
     fi
 done
 
-# Step 4: Test Django project creation
+# Test Django project creation
 if [ -d "Khukumoni" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django project creation: PASS${NC}"
 else
@@ -3583,7 +3583,7 @@ fi
 # Navigate to the project directory
 cd Khukumoni
 
-# Step 5: Test Django settings update
+# Test Django settings update
 SETTINGS_FILE="Khukumoni/settings.py"
 
 # Check if the necessary apps are added
@@ -3631,7 +3631,7 @@ else
     exit 1
 fi
 
-# Step 7: Test migration
+# Test migration
 if python manage.py showmigrations | grep -q '[X]'; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations: PASS${NC}"
 else
@@ -3639,7 +3639,7 @@ else
     exit 1
 fi
 
-# Step 8: Test superuser creation
+# Test superuser creation
 if python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(username='admin').exists())" | grep -q 'True'; then
     echo -e "${GREEN}${CHECK_MARK} Superuser creation: PASS${NC}"
 else
@@ -3656,7 +3656,7 @@ fi
 print_header "Checking app creation - Product Management"
 # Test script for the Product Management App setup
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "ProductManagement" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -3664,7 +3664,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("Brand" "Category" "Product" "Variant" "Image" "Video" "Pricing" "Discount")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "ProductManagement/models.py"; then
@@ -3675,7 +3675,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "admin.site.register(Brand, BrandAdmin)" "ProductManagement/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -3683,7 +3683,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run ProductManagement &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -3700,7 +3700,7 @@ fi
 
 print_header "Checking app creation - Inventory Management"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "InventoryManagement" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -3708,7 +3708,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("InventoryLocation" "Inventory" "InventoryHistory" "StockAlert" "StockTransfer" "Batch" "ExpiryManagement" "InventoryReport" "InventoryAdjustmentReason")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "InventoryManagement/models.py"; then
@@ -3719,7 +3719,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "admin.site.register(InventoryLocation)" "InventoryManagement/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -3727,7 +3727,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run InventoryManagement &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -3742,7 +3742,7 @@ fi
 
 print_header "Checking app creation - Customer Management"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "CustomerManagement" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -3750,7 +3750,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("Customer" "CustomerPreference" "CustomerTag" "CustomerNote" "Lead" "Opportunity" "Interaction" "Task" "Segment" "Survey" "Integration" "NPSResponse" "LifecycleStage" "CalendarEvent" "Document")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "CustomerManagement/models.py"; then
@@ -3761,7 +3761,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "admin.site.register(Customer, CustomerAdmin)" "CustomerManagement/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -3769,7 +3769,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run CustomerManagement &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -3785,7 +3785,7 @@ fi
 
 print_header "Checking app creation - Order Management"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "OrderManagement" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -3793,7 +3793,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("Order" "OrderItem" "Shipment" "Return" "Refund" "OrderCommunication" "RecurringOrder" "OrderBatch")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "OrderManagement/models.py"; then
@@ -3804,7 +3804,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "admin.site.register(Order, OrderAdmin)" "OrderManagement/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -3812,7 +3812,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run OrderManagement &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -3826,7 +3826,7 @@ fi
 
 print_header "Checking app creation - Payment Processing"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "PaymentProcessing" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -3834,7 +3834,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("Payments" "PaymentMethods" "PaymentHistory" "PaymentTokens" "PaymentNotifications" "PaymentGateways" "RecurringPayments" "Settlements" "FraudDetection" "SecureAuthentication")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "PaymentProcessing/models.py"; then
@@ -3845,7 +3845,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "admin.site.register(Payments, PaymentAdmin)" "PaymentProcessing/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -3853,7 +3853,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run PaymentProcessing &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -3869,7 +3869,7 @@ fi
 
 print_header "Checking app creation - hipping and Fulfillment"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "ShippingAndFulfillment" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -3877,7 +3877,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("ShippingAddress" "ShippingLabel" "PackageTracking" "ShippingCarrier" "ShippingInsurance" "ShippingZone" "ShippingPreference" "ShippingNotification" "DeliverySchedule" "Location" "ShippingCost" "ShippingRestriction" "OrderRestriction")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "ShippingAndFulfillment/models.py"; then
@@ -3888,7 +3888,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "@admin.register(ShippingAddress)" "ShippingAndFulfillment/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -3896,7 +3896,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run ShippingAndFulfillment &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -3910,7 +3910,7 @@ fi
 
 print_header "Checking app creation - Search and Filtering"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "SearchAndFiltering" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -3918,7 +3918,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("AdvancedSearchHistory" "AttributeValues" "SavedSearches" "SearchHistory" "SearchIndex" "SearchFiltersPersistence" "SearchResultsExportHistory" "SearchRelevanceRanking")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "SearchAndFiltering/models.py"; then
@@ -3929,7 +3929,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "@admin.register(AdvancedSearchHistory)" "SearchAndFiltering/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -3937,7 +3937,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run SearchAndFiltering &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -3954,7 +3954,7 @@ print_header "Checking app creation - Marketing and Promotions"
 
 # Test script for the Marketing and Promotions App setup
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "MarketingAndPromotions" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -3962,7 +3962,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("PromotionRules" "PromotionCoupons" "PromotionSegments" "PromotionAnalytics" "PromotionTargeting" "PromotionABTesting" "PromotionContent" "PromotionPersonalization" "PromotionCollaborationHistory" "PromotionAutomation" "PromotionIntegrations")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "MarketingAndPromotions/models.py"; then
@@ -3973,7 +3973,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "@admin.register(PromotionRules)" "MarketingAndPromotions/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -3981,7 +3981,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run MarketingAndPromotions &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -3996,7 +3996,7 @@ fi
 
 print_header "Checking app creation - Analytics and Reporting"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "AnalyticsAndReporting" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -4004,7 +4004,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("RevenueAnalytics" "CustomerBehaviorAnalytics" "ProductPerformanceAnalytics" "OrderFulfillmentAnalytics" "InventoryManagementAnalytics" "MarketingCampaignAnalytics" "CustomerServiceAnalytics" "UserEngagementAnalytics" "ConversionRateOptimizationAnalytics" "FinancialReporting" "DataVisualizationDashboards" "CustomReporting")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "AnalyticsAndReporting/models.py"; then
@@ -4015,7 +4015,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "@admin.register(RevenueAnalytics)" "AnalyticsAndReporting/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -4023,7 +4023,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run AnalyticsAndReporting &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -4038,7 +4038,7 @@ fi
 
 print_header "Checking app creation - Wishlist Management"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "WishlistManagement" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -4046,7 +4046,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("Wishlist" "WishlistItem" "WishlistSharing" "WishlistPrivacy" "WishlistNotification" "WishlistCollaborator" "WishlistNote" "WishlistRating" "WishlistReview" "WishlistImportExport" "WishlistRecommendation" "WishlistAnalytics" "WishlistSetting" "WishlistSync" "WishlistBackupRestore")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "WishlistManagement/models.py"; then
@@ -4057,7 +4057,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "admin.site.register(Wishlist, WishlistAdmin)" "WishlistManagement/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -4065,7 +4065,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run WishlistManagement &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -4082,7 +4082,7 @@ fi
 
 print_header "Checking app creation - Reviews and Ratings"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "ReviewsAndRatings" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -4090,7 +4090,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("Review" "ReviewReply" "ReviewFilter" "ReviewReport" "ReviewNotification" "ReviewAnalytics" "ReviewImportExport" "ReviewResponseTemplate" "ReviewAggregation" "ReviewIntegration" "ReviewGamification" "ReviewAuthentication")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "ReviewsAndRatings/models.py"; then
@@ -4101,7 +4101,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "admin.site.register(Review, ReviewAdmin)" "ReviewsAndRatings/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -4109,7 +4109,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run ReviewsAndRatings &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -4124,7 +4124,7 @@ fi
 
 print_header "Checking app creation - Recommendations"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "Recommendations" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -4132,7 +4132,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("PersonalizedRecommendation" "SimilarProduct" "TrendingProduct" "NewArrival" "Bestseller" "CrossSellProduct" "UpSellProduct" "FrequentlyBoughtTogether" "CustomerBasedRecommendation" "DynamicPricingRecommendation" "RecommendationRule" "RealTimeRecommendationUpdate" "SegmentBasedRecommendation" "FeedbackRecommendation" "RecommendationPerformanceAnalytics" "CustomerSpecificRecommendation")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "Recommendations/models.py"; then
@@ -4143,7 +4143,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "admin.site.register(PersonalizedRecommendation, PersonalizedRecommendationAdmin)" "Recommendations/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -4151,7 +4151,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run Recommendations &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -4166,7 +4166,7 @@ fi
 
 print_header "Checking app creation - Cart Management"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "CartManagement" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -4174,7 +4174,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("Cart" "CartItems" "CartItemDetails" "CartDiscounts" "CartPromotions" "CartItemNotes" "CartSharing" "CartSaveForLater" "CartExpiration" "CartPersistence" "CartRecommendations" "CartRecovery" "CartItemCustomization" "CartItemSubscription")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "CartManagement/models.py"; then
@@ -4185,7 +4185,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "@admin.register(Cart)" "CartManagement/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -4193,7 +4193,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run CartManagement &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -4209,7 +4209,7 @@ fi
 
 print_header "Checking app creation - Subscription Management"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "SubscriptionManagement" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -4217,7 +4217,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("Subscriptions" "SubscriptionPlans" "SubscriptionCancellationReasons" "SubscriptionRenewalReminders" "SubscriptionPaymentMethods" "SubscriptionUsageTracking" "SubscriptionAnalytics" "SubscriptionDiscounts" "SubscriptionCustomizationOptions")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "SubscriptionManagement/models.py"; then
@@ -4228,7 +4228,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "@admin.register(Subscriptions)" "SubscriptionManagement/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -4236,7 +4236,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run SubscriptionManagement &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -4252,7 +4252,7 @@ fi
 
 print_header "Checking app creation - Order Tracking"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "OrderTracking" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -4260,7 +4260,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("OrderTracking" "TrackingUpdates" "DeliveryRoutes" "ProofOfDelivery" "DeliveryNotifications" "DeliveryIssues" "CarrierIntegration" "DeliveryHistory" "DeliverySignatures")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "OrderTracking/models.py"; then
@@ -4271,7 +4271,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "admin.site.register(OrderTracking, OrderTrackingAdmin)" "OrderTracking/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -4279,7 +4279,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run OrderTracking &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -4295,7 +4295,7 @@ fi
 
 print_header "Checking app creation - Customer Support"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "CustomerSupport" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -4303,7 +4303,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("LiveChatSession" "ChatHistory" "AgentAvailability" "SupportTicket" "FAQ" "KnowledgeBaseArticle" "CustomerFeedback" "Escalation" "SupportAnalytics" "SupportAvailability" "SupportLanguage" "SupportResource" "AgentPerformance" "SupportIntegration")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "CustomerSupport/models.py"; then
@@ -4314,7 +4314,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "admin.site.register(LiveChatSession, LiveChatSessionAdmin)" "CustomerSupport/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -4322,7 +4322,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run CustomerSupport &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -4336,7 +4336,7 @@ fi
 
 print_header "Checking app creation - Social Share"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "SocialShare" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -4344,7 +4344,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("SocialShare" "SocialAnalytics" "SocialLike" "SocialComment" "SocialPrivacy" "UserSocialProfile" "SocialBadge" "SocialReward" "SocialRecommendation" "SocialTrendingTopic" "InfluencerCampaign" "SocialCollaboration" "CMSIntegration")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "SocialShare/models.py"; then
@@ -4355,7 +4355,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "admin.site.register(SocialShare, SocialShareAdmin)" "SocialShare/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -4363,7 +4363,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run SocialShare &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
@@ -4376,7 +4376,7 @@ fi
 
 print_header "Checking app creation - Loyalty Program"
 
-# Step 1: Test Django app creation
+# Test Django app creation
 if [ -d "LoyaltyProgram" ]; then
     echo -e "${GREEN}${CHECK_MARK} Django app creation: PASS${NC}"
 else
@@ -4384,7 +4384,7 @@ else
     exit 1
 fi
 
-# Step 2: Test Django models creation
+# Test Django models creation
 MODELS=("LoyaltyEnrollment" "LoyaltyPointsHistory" "LoyaltyRedemptionHistory" "LoyaltyTier" "LoyaltyMembershipStatus" "LoyaltyEarningOpportunity" "LoyaltyCustomization" "LoyaltyPromotion" "LoyaltyPointsTransfer" "LoyaltyAnalytics" "LoyaltyReferral" "LoyaltyNotification")
 for model in "${MODELS[@]}"; do
     if grep -q "class $model(models.Model):" "LoyaltyProgram/models.py"; then
@@ -4395,7 +4395,7 @@ for model in "${MODELS[@]}"; do
     fi
 done
 
-# Step 3: Test Django admin registration
+# Test Django admin registration
 if grep -q "admin.site.register(LoyaltyEnrollment, LoyaltyEnrollmentAdmin)" "LoyaltyProgram/admin.py"; then
     echo -e "${GREEN}${CHECK_MARK} Django admin registration: PASS${NC}"
 else
@@ -4403,7 +4403,7 @@ else
     exit 1
 fi
 
-# Step 4: Test Django migrations
+# Test Django migrations
 if python manage.py makemigrations --dry-run LoyaltyProgram &> /dev/null; then
     echo -e "${GREEN}${CHECK_MARK} Django migrations creation: PASS${NC}"
 else
