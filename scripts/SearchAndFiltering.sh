@@ -10,11 +10,11 @@ SETTINGS_FILE="../$PROJECT_NAME/$PROJECT_NAME/settings.py"
 PROJECT_URLS_FILE="../$PROJECT_NAME/$PROJECT_NAME/urls.py"
 APP_URLS_FILE="../$PROJECT_NAME/$APP_NAME/urls.py"
 
-# Step 1: Create the api folder and files
+# Create the api folder and files
 mkdir -p $API_DIR
 touch $API_DIR/__init__.py
 
-# Step 2: Create serializers.py
+# Create serializers.py
 cat <<EOF > $SERIALIZERS_FILE
 from rest_framework import serializers
 from django.contrib.auth.models import User
@@ -65,7 +65,7 @@ class SearchRelevanceRankingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 EOF
 
-# Step 3: Create views.py
+# Create views.py
 cat <<EOF > $VIEWS_FILE
 from rest_framework import viewsets
 from ..models import (
@@ -112,7 +112,7 @@ class SearchRelevanceRankingViewSet(viewsets.ModelViewSet):
     serializer_class = SearchRelevanceRankingSerializer
 EOF
 
-# Step 4: Create urls.py
+# Create urls.py
 cat <<EOF > $URLS_FILE
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
@@ -137,7 +137,7 @@ urlpatterns = [
 ]
 EOF
 
-# Step 5: Ensure the main project urls.py file exists and include the api urls
+# Ensure the main project urls.py file exists and include the api urls
 if [ ! -f "$APP_URLS_FILE" ]; then
     # Create the main urls.py if it does not exist
     cat <<EOF > $APP_URLS_FILE
@@ -154,12 +154,12 @@ else
     fi
 fi
 
-# Step 6: Add the app path to the main project urls.py if not already included
+# Add the app path to the main project urls.py if not already included
 if ! grep -q "path('$APP_NAME/', include('$APP_NAME.urls'))" "$PROJECT_URLS_FILE"; then
     sed -i "/urlpatterns = \[/a \ \ \ \ path('$APP_NAME/', include('$APP_NAME.urls'))," $PROJECT_URLS_FILE
 fi
 
-# Step 7: Ensure the app is added to INSTALLED_APPS in settings.py
+# Ensure the app is added to INSTALLED_APPS in settings.py
 if ! grep -q "'$APP_NAME'," "$SETTINGS_FILE"; then
     sed -i "/INSTALLED_APPS = \[/a \ \ \ \ '$APP_NAME'," $SETTINGS_FILE
 fi
