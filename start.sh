@@ -33,14 +33,10 @@ source .env/bin/activate
 pip install django djangorestframework djangorestframework-simplejwt django-cors-headers
 
 # Step 4: Create a Django project named Khukumoni
-if [ -d "Khukumoni" ]; then
-  echo "Project 'Khukumoni' already exists. Navigating to the project directory."
-  cd Khukumoni
-else
-  echo "Project 'Khukumoni' does not exist. Creating a new project."
-  django-admin startproject Khukumoni
-  cd Khukumoni
-fi
+django-admin startproject Khukumoni
+
+# Navigate to the project directory
+cd Khukumoni
 
 # Step 5: Update Django project settings
 SETTINGS_FILE="Khukumoni/settings.py"
@@ -92,59 +88,29 @@ if ! grep -q "from django.conf import settings" "$URLS_FILE"; then
 fi
 
 
-# Check if the static and media URL configurations are present in the urls.py file
-if grep -Fxq "urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)" "$URLS_FILE" && grep -Fxq "urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)" "$URLS_FILE"; then
-    echo "Static and media URL configurations are already present in $URLS_FILE."
-else
-    # Add the static and media URL configurations to the urls.py file
-    echo "Adding static and media URL configurations to $URLS_FILE..."
-    echo "
+# Adding static and media URL patterns
+echo "
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-" >> "$URLS_FILE"
-    echo "Static and media URL configurations added to $URLS_FILE."
-fi
+" >> $URLS_FILE
 
 
-# Check if the lines are already present in the admin.py file
-if grep -Fxq "admin.site.site_header = 'Khukumoni Administration'" "$ADMIN_FILE" && grep -Fxq "admin.site.site_title = 'Khukumoni Admin Portal'" "$ADMIN_FILE" && grep -Fxq "admin.site.index_title = 'Welcome to Khukumoni Admin Area'" "$ADMIN_FILE"; then
-    echo "Admin customization lines are already present in $ADMIN_FILE."
-else
-    # Add the admin customization lines to the admin.py file
-    echo "Adding admin customization lines to $ADMIN_FILE..."
-    echo "
+echo "
+
+
 admin.site.site_header = 'Khukumoni Administration'
 admin.site.site_title = 'Khukumoni Admin Portal'
 admin.site.index_title = 'Welcome to Khukumoni Admin Area'
-" >> "$ADMIN_FILE"
-    echo "Admin customization lines added to $ADMIN_FILE."
-fi
+"  >> $URLS_FILE
 
 
 # Add JWT and REST framework URL patterns
 URLPATTERNS_INSERT_LINE=$(grep -n "urlpatterns = \[" "$URLS_FILE" | cut -d: -f1)
-# Check if the import line is already present in the urls.py file
-IMPORT_INSERT_LINE=$(grep -n "urlpatterns = \[" "$URLS_FILE" | cut -d: -f1)
-if grep -q "from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView" "$URLS_FILE"; then
-    echo "Import line for JWT and REST framework views is already present in $URLS_FILE."
-else
-    # Add the import line for JWT and REST framework views to the urls.py file
-    echo "Adding import line for JWT and REST framework views to $URLS_FILE..."
-    sed -i "${IMPORT_INSERT_LINE}a from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView" "$URLS_FILE"
-    echo "Import line for JWT and REST framework views added to $URLS_FILE."
+if ! grep -q "from rest_framework import routers" "$URLS_FILE"; then
+    sed -i "${IMPORT_INSERT_LINE}a from django.urls import include\nfrom rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView" "$URLS_FILE"
 fi
 
-# Check if the URL patterns are already present in the urls.py file
-if grep -q "path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair')," "$URLS_FILE" && grep -q "path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh')," "$URLS_FILE"; then
-    echo "JWT and REST framework URL patterns are already present in $URLS_FILE."
-else
-    # Add the URL patterns for JWT and REST framework views to the urls.py file
-    echo "Adding JWT and REST framework URL patterns to $URLS_FILE..."
-    sed -i "${URLPATTERNS_INSERT_LINE}a     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair')," "$URLS_FILE"
-    sed -i "${URLPATTERNS_INSERT_LINE}a     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh')," "$URLS_FILE"
-    echo "JWT and REST framework URL patterns added to $URLS_FILE."
-fi
 # Append URL patterns for REST framework and JWT
 # Find the line with 'urlpatterns =' and append the new paths
 sed -i "/urlpatterns = \[/a \ \ \ \ path('api-auth/', include('rest_framework.urls')),\n\ \ \ \ path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),\n\ \ \ \ path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh')," "$URLS_FILE"
@@ -154,18 +120,12 @@ python manage.py migrate
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@localhost', 'admin')" | python manage.py shell
 
 
+
 ## Product Management App ##
 
 # Step 1: Create Django app
-# Check if the 'ProductManagement' app is already added to INSTALLED_APPS
-if grep -q "'ProductManagement'," "$SETTINGS_FILE"; then
-    echo "'ProductManagement' app is already added to INSTALLED_APPS in $SETTINGS_FILE."
-else
-    # Add the 'ProductManagement' app to INSTALLED_APPS in settings.py
-    echo "Adding 'ProductManagement' app to INSTALLED_APPS in $SETTINGS_FILE..."
-    sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'ProductManagement'," "$SETTINGS_FILE"
-    echo "'ProductManagement' app added to INSTALLED_APPS in $SETTINGS_FILE."
-
+python manage.py startapp ProductManagement
+sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'ProductManagement'," $SETTINGS_FILE
 
 
 # Step 2: Create Django models for each table
@@ -305,8 +265,6 @@ EOF
 # Step 4: Create Django migrations
 python manage.py makemigrations ProductManagement
 
-
-fi
 
 ## Create Inventory Management ##
 
@@ -4501,8 +4459,8 @@ fi
 
 
 # GitHub repository URL
-repo_url="https://api.github.com/repos/tovfikur/E-Com/contents/scripts"
-raw_base_url="https://raw.githubusercontent.com/tovfikur/E-Com/main/scripts"
+repo_url="https://api.github.com/repos/tovfikur/E-Com/contents/apis"
+raw_base_url="https://raw.githubusercontent.com/tovfikur/E-Com/main/apis"
 
 # Fetch the list of files from the GitHub repository using the API
 json_content=$(curl -s "$repo_url")
