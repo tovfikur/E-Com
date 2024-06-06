@@ -11,7 +11,7 @@ To get started with the ecommerce API, follow these simple steps:
 2. **Navigate to the Project Directory:**
 
 3. **Run the Script:**
-Execute the `start_backend.sh` script to set up the backend environment and start the API server:
+Execute the `start.sh` script to set up the backend environment and start the API server:
 
 4. **Access the API:**
 Once the script has completed execution, you can access the API at `http://localhost:8000/`.
