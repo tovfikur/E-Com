@@ -7,3 +7,5 @@ cd ..
 
 npx create-next-app khukumoni --use-npm --example with-typescript --js
 npm install axios
+
+npm start
