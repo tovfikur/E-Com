@@ -5,7 +5,8 @@
 
 cd ..
 
-npx create-next-app khukumoni --use-npm --example with-tailwindcss --js
+yes "No" | npx create-next-app khukumoni --use-npm --typescript --eslint --tailwind --no-src --no-app-router --no-alias --
+react
 npm install axios
 npm run build
 npm start
