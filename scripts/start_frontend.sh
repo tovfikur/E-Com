@@ -5,4 +5,5 @@
 
 cd ..
 
-npm create-next-app frontend --example with-react
+npx create-next-app KhukumoniFrontEnd --example https://nextjs.org/learn/basics/getting-started
+npm install axios

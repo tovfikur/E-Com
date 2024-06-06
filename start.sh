@@ -4459,8 +4459,8 @@ fi
 
 
 # GitHub repository URL
-repo_url="https://api.github.com/repos/tovfikur/E-Com/contents/apis"
-raw_base_url="https://raw.githubusercontent.com/tovfikur/E-Com/main/apis"
+repo_url="https://api.github.com/repos/tovfikur/E-Com/contents/scripts"
+raw_base_url="https://raw.githubusercontent.com/tovfikur/E-Com/main/scripts"
 
 # Fetch the list of files from the GitHub repository using the API
 json_content=$(curl -s "$repo_url")
