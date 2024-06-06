@@ -3,4 +3,6 @@
 # install packages
 # npm install bootstrap reactstrap --legacy-peer-deps
 
-touch test-package-of 
+cd frontend
+
+npm create next-app -- --react --ts --eslint --use-npm  

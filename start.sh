@@ -120,15 +120,6 @@ python manage.py migrate
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@localhost', 'admin')" | python manage.py shell
 
 
-
-## Frontend App ##
-
-# Step 1: Create Django app
-python manage.py startapp frontend
-sed -i "/INSTALLED_APPS = \[/a \ \ \ \ 'frontend'," $SETTINGS_FILE
-
-
-
 ## Product Management App ##
 
 # Step 1: Create Django app
@@ -4467,8 +4458,8 @@ fi
 
 
 # GitHub repository URL
-repo_url="https://api.github.com/repos/tovfikur/E-Com/contents/apis"
-raw_base_url="https://raw.githubusercontent.com/tovfikur/E-Com/main/apis"
+repo_url="https://api.github.com/repos/tovfikur/E-Com/contents/scripts"
+raw_base_url="https://raw.githubusercontent.com/tovfikur/E-Com/main/scripts"
 
 # Fetch the list of files from the GitHub repository using the API
 json_content=$(curl -s "$repo_url")
