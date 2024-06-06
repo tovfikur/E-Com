@@ -5,7 +5,7 @@
 
 cd ..
 
-npx create-next-app khukumoni --use-npm --example with-styled-components --js
+npx create-next-app khukumoni --use-npm --js
 npm install axios
 
 npm start
